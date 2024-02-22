@@ -1,0 +1,1 @@
+./bin/cpm_model ./Debug/tai -a 120 -k 50 -t 14 -i chry.txt

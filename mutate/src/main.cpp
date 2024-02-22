@@ -16,8 +16,7 @@ int main(int argc, char** argv){
 
     std::string sequence;
 
-    try
-    {
+    try{
         std::stringstream sequenceStream;
 
         fileSource.open(args.inputFilePath);
@@ -26,14 +25,8 @@ int main(int argc, char** argv){
         fileSource.close();
 
         sequence = sequenceStream.str();
-    }
-    catch(const std::ifstream::failure& e)
-    {
+    } catch(const std::ifstream::failure& e){
         std::cerr << "ERROR::SOURCE::FILE_NOT_SUCCESFULLY_READ" << '\n';
         return EXIT_FAILURE;
     }
-
-
-    std::cout << "K: " << args.k << "\nThreshHold: " << args.threshHold << "\nAlpha: " << args.alpha << "\nInput: " << args.inputFilePath.string() << std::endl;
-    return 0;
 }
