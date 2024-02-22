@@ -1,7 +1,7 @@
 OUTPUT_DIR := Debug
 OUTPUT_FILE := ${OUTPUT_DIR}/tai
 
-C_SRC := src/main.cpp
+C_SRC := src/main.cpp src/include/argparser/argparser.cpp
 
 C_OBJS := $(C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 

@@ -1,1 +1,1 @@
-./Debug/tai arg1
+./Debug/tai ./Debug/tai -a 120 -k 50 -t 14 -i chry.txt
