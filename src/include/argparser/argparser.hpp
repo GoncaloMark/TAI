@@ -2,10 +2,14 @@
 #include <filesystem>
 
 /// @brief      Arguments struct encapsulates the fields to be parsed by the argument parser
-/// @property   mutationChance - Chance of changing the file
+/// @property   k - Sliding Window size
+/// @property   threshHold - Maximum margin for fails
+/// @property   alpha - Control term
 /// @property   inputFilePath - file path to read
 typedef struct Arguments {
-    double mutationChance;
+    int k;
+    double threshHold;
+    double alpha;
     std::filesystem::path inputFilePath;
 } args_t;
 
@@ -24,11 +28,6 @@ class ArgParser {
         args_t ParseArgs() const;
 
     private:
-        /// @brief      Verifies if input argument is a number
-        /// @param s    pointer to characters to be read and verify if its a number.
-        /// @return     true if s is a number, false if it's not a number.
-        bool isNumber(char* s) const;
-        
         int argc;
         char** argv;
 };

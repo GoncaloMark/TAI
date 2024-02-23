@@ -1,4 +1,5 @@
 #include "argparser.hpp"
+#include "../utils/utils.hpp"
 #include <iostream>
 #include <string>
 
@@ -10,14 +11,6 @@ void ArgParser::ShowHelp() const {
     << "-t \t Threshold\n" \
     << "-i \t File with target sequence\n" \
     << "-h \t Print this help message" << std::endl;
-}
-
-bool ArgParser::isNumber(char* s) const{
-    int result = atoi(s);
-    if (result == 0 ) {
-        return false;
-    }
-    return true;
 }
 
 args_t ArgParser::ParseArgs() const {

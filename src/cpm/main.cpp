@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "include/argparser/argparser.hpp"
+#include "../include/argparser/argparser.hpp"
 
 int main(int argc, char** argv){
     argc--;
@@ -29,4 +29,7 @@ int main(int argc, char** argv){
         std::cerr << "ERROR::SOURCE::FILE_NOT_SUCCESFULLY_READ" << '\n';
         return EXIT_FAILURE;
     }
+
+    std::cout << "K: " << args.k << "\nThreshHold: " << args.threshHold << "\nAlpha: " << args.alpha << "\nInput: " << args.inputFilePath.string() << std::endl;
+    return 0;
 }

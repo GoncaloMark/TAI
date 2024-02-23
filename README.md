@@ -23,16 +23,9 @@ git clone <paste URL of the forked repo here>
 ```
 
 - thirdly, once you have cloned the repository, you can navigate to the directory of the repository and run the following command to compile the code:
-    For cpm:
 
     ```bash
-    make cpm
-    ```
-
-    For mutate:
-
-    ```bash
-    make mutate
+    make all
     ```
 
     Remember to get chry.txt
