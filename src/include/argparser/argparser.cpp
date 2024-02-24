@@ -1,10 +1,11 @@
-#include "argparser.hpp"
-#include "../utils/utils.hpp"
+#include <filesystem>
 #include <iostream>
 #include <string>
+#include "argparser.hpp"
+#include "../utils/utils.hpp"
 
 void ArgParser::ShowHelp() const {
-    std::cout << "cmp: cmp [-akf]\n" \
+    std::cout << "cmp: cmp [-aktih]\n" \
     << "Options:\n" \
     << "-a \t Alpha\n" \
     << "-k \t Window size\n" \

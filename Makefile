@@ -21,7 +21,6 @@ CFLAGS := -c -O2 -Wall -Werror -ggdb -c -I"./src/include"
 #* TARGETS
 all: clean cpm mutate
 
-
 #* CPM TARGETS
 cpm:	$(CPM_OUTPUT_FILE)
 

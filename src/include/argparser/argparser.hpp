@@ -1,5 +1,4 @@
 #pragma once
-#include <filesystem>
 
 /// @brief      Arguments struct encapsulates the fields to be parsed by the argument parser
 /// @property   k - Sliding Window size
