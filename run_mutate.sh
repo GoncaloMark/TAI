@@ -1,1 +1,1 @@
-bin/mutate_program -c 75 -i chry.txt
+./bin/mutate_program chry.txt 20

@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <iostream>
 #include <string>
 #include "argparser.hpp"
@@ -14,14 +13,14 @@ void ArgParser::ShowHelp() const {
     << "-h \t Print this help message" << std::endl;
 }
 
-args_t ArgParser::ParseArgs() const {
+cpm_args_t ArgParser::ParseArgs() const {
     if (argc == 0) {
         std::cerr << "No arguments were entered." << std::endl;
         ArgParser::ShowHelp();
         exit(EXIT_FAILURE);
     }
 
-    args_t args;
+    cpm_args_t args;
 
     args.k = 0;
     args.alpha = 0;

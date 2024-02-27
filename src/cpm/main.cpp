@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     argv++;
 
     ArgParser parser(argc, argv);
-    const args_t args = parser.ParseArgs();
+    const cpm_args_t args = parser.ParseArgs();
 
     std::ifstream fileSource;
     // Turn the exceptions bit on
