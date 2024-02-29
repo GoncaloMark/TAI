@@ -1,7 +1,9 @@
 OUTPUT_DIR := bin
+INCLUDE_DIR := src/include/
+
 
 #* INCLUDE OBJS
-INCLUDE_SRC := src/include/argparser/argparser.cpp src/include/utils/utils.cpp src/include/utils/utf8Parser.cpp
+INCLUDE_SRC := $(shell find $(INCLUDE_DIR) -name '*.cpp')
 INCLUDE_C_OBJS := $(INCLUDE_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* CPM
