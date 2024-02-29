@@ -2,30 +2,25 @@
 #include <fstream>
 #include <sstream>
 #include "../include/argparser/argparser.hpp"
-
-char mutateChar(char c) {
-    char chars[] = {'A', 'C', 'G', 'T'};
-    char newChar = chars[rand() % 4];
-    while (newChar == c) {
-        newChar = chars[rand() % 4];
-    }
-    return newChar;
-}
+#include "mutate.hpp"
 
 int main(int argc, char** argv){
     argc--;
     argv++;
 
-    if(argc < 1){
-        std::cerr << "ERROR::MISSING_ARGUMENTS" << '\n';
+    ArgParser::ArgParser parser(argc, argv);
 
-        std::cout << "Example:\n" \
-        << "mutate file.txt 20:\n" \
-        << std::endl;
-        return EXIT_FAILURE;
-    }
+    parser.registerArgType<double>("--probability");
+    parser.registerArgType<std::filesystem::path>("--inputFileName");
+    parser.registerArgType<std::filesystem::path>("--outputFileName");
 
-    double prob = atof(argv[1]) / 100.0; 
+    parser.ParseArgs();
+
+    double prob = parser.GetArgValue<double>("--probability") / 100.0;
+    std::filesystem::path inputFileName = parser.GetArgValue<std::filesystem::path>("--inputFileName");
+    std::filesystem::path outputFileName = parser.GetArgValue<std::filesystem::path>("--outputFileName");
+
+    // Seed the randomness
     srand(static_cast<unsigned>(time(nullptr)));
 
     const size_t bufferSize = 1024; 
@@ -40,13 +35,13 @@ int main(int argc, char** argv){
     fileOutput.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 
     try {
-        fileSource.open(argv[0], std::ifstream::binary);
+        fileSource.open(inputFileName, std::ifstream::binary);
         if (!fileSource.is_open()) {
             std::cerr << "ERROR::SOURCE::FILE_NOT_SUCCESFULLY_OPENED" << '\n';
             throw std::ios_base::failure("ERROR::SOURCE::FILE_NOT_SUCCESFULLY_OPENED");
         }
 
-        fileOutput.open("mutated_chry.txt", std::ofstream::binary);
+        fileOutput.open(outputFileName, std::ofstream::binary);
         if (!fileOutput.is_open()) {
             std::cerr << "ERROR::OUTPUT::FILE_NOT_SUCCESFULLY_OPENED" << '\n';
             throw std::ios_base::failure("ERROR::OUTPUT::FILE_NOT_SUCCESFULLY_OPENED");
@@ -63,7 +58,7 @@ int main(int argc, char** argv){
             if (fileSource.peek() == EOF) break;
         }
 
-        std::cout << "Successfully Mutated " << argv[0] << " File" << std::endl;
+        std::cout << "Successfully Mutated " << inputFileName << " File" << std::endl;
     } catch (const std::ios_base::failure& e) {
         std::cerr << "ERROR::INPUT_FILE_NOT_SUCCESFULLY_PROCESSED::" << e.what() << '\n';
         fileSource.close();

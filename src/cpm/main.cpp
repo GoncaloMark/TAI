@@ -7,8 +7,19 @@ int main(int argc, char** argv){
     argc--;
     argv++;
 
-    ArgParser parser(argc, argv);
-    const cpm_args_t args = parser.ParseArgs();
+    ArgParser::ArgParser parser(argc, argv);
+    
+    parser.registerArgType<int>("--k");
+    parser.registerArgType<double>("--alpha");
+    parser.registerArgType<double>("--threshold");
+    parser.registerArgType<std::filesystem::path>("--inputFileName");
+
+    parser.ParseArgs();
+
+    int k = parser.GetArgValue<int>("--k");
+    double alpha = parser.GetArgValue<double>("--alpha");
+    double threshold = parser.GetArgValue<double>("--threshold");
+    std::filesystem::path inputFileName = parser.GetArgValue<std::filesystem::path>("--inputFileName");
 
     std::ifstream fileSource;
     // Turn the exceptions bit on
@@ -19,7 +30,7 @@ int main(int argc, char** argv){
     try{
         std::stringstream sequenceStream;
 
-        fileSource.open(args.inputFilePath);
+        fileSource.open(inputFileName);
         //TODO: Do not read the whole file into stack memory
         sequenceStream << fileSource.rdbuf();
         fileSource.close();
@@ -30,6 +41,6 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    std::cout << "K: " << args.k << "\nThreshHold: " << args.threshHold << "\nAlpha: " << args.alpha << "\nInput: " << args.inputFilePath.string() << std::endl;
+    std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
     return 0;
 }

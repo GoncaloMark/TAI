@@ -1,1 +1,1 @@
-./bin/mutate_program chry.txt 20
+./bin/mutate_program --inputFileName chry.txt --probability 20 --outputFileName mutated_chry.txt

@@ -11,7 +11,7 @@ CPM_C_OBJS := $(CPM_C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* MUTATE
 MUTATE_OUTPUT_FILE := ${OUTPUT_DIR}/mutate_program
-MUTATE_C_SRC := src/mutate/main.cpp 
+MUTATE_C_SRC := src/mutate/main.cpp src/mutate/mutate.cpp
 MUTATE_C_OBJS := $(MUTATE_C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* COMPILER STUFF
