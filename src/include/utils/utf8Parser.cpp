@@ -1,20 +1,16 @@
 #include "utf8Parser.hpp"
 
 namespace UTF8 {
-    uint32_t utf8ToCodepoint(const std::string& utf8) {
+    uint32_t utf8ToHex(const std::string& utf8) {
         std::vector<unsigned char> bytes(utf8.begin(), utf8.end());
-        uint32_t codepoint = 0;
+        uint32_t hex = 0;
         size_t numBytes = bytes.size();
-        if (numBytes == 1) {
-            codepoint = bytes[0];
-        } else if (numBytes == 2) {
-            codepoint = ((bytes[0] & 0x1F) << 6) | (bytes[1] & 0x3F);
-        } else if (numBytes == 3) {
-            codepoint = ((bytes[0] & 0x0F) << 12) | ((bytes[1] & 0x3F) << 6) | (bytes[2] & 0x3F);
-        } else if (numBytes == 4) {
-            codepoint = ((bytes[0] & 0x07) << 18) | ((bytes[1] & 0x3F) << 12) | ((bytes[2] & 0x3F) << 6) | (bytes[3] & 0x3F);
+        for (size_t i = 0; i < numBytes; ++i) {
+            if (i >= 4) break;
+
+            hex = (hex << 8) | (static_cast<uint8_t>(utf8[i]) & 0xFF);
         }
-        return codepoint;
+        return hex;
     }
 
     uint32_t utf8ToLower(uint32_t utf8){
@@ -48,8 +44,8 @@ namespace UTF8 {
                     }
 
                     std::string utf8Char = chunk.substr(start, len);
-                    uint32_t codepoint = utf8ToCodepoint(utf8Char);
-                    codePoints.insert(utf8ToLower(codepoint));
+                    uint32_t hex = utf8ToHex(utf8Char);
+                    characters.insert(utf8ToLower(hex));
 
                     i += len;
                 }

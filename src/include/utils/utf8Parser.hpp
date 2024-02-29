@@ -13,7 +13,7 @@ namespace UTF8 {
     /// @brief Utility function takes the utf8 string representation and builds the uint32_t format.
     /// @param utf8 UTF8 string format of the bytes.
     /// @return Unsigned integer with 32 bits representing the bytes in hexadecimal notation.
-    uint32_t utf8ToCodepoint(const std::string& utf8);
+    uint32_t utf8ToHex(const std::string& utf8);
 
     /// @brief This is a utility function used for converting characters to lower case if they're uppercase.
     /// @param utf8 Hexadecimal code of the character to be converted.
@@ -30,13 +30,13 @@ namespace UTF8 {
 
         /// @brief Prints the hexadecimal code points stored in the unordered_set.
         void printCodePoints() {
-            for (const auto& codePoint : codePoints) {
-                std::cout << "0x" << std::hex << codePoint << std::endl;
+            for (const auto& character : characters) {
+                std::cout << "0x" << std::hex << character << std::endl;
             }
         }
 
         private:
-            std::unordered_set<uint32_t> codePoints;
+            std::unordered_set<uint32_t> characters;
             size_t bufferSize;
 
             /// @brief Private method to get the size in bytes of the character being read.
