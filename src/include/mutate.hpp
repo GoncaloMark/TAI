@@ -8,7 +8,6 @@
 
 namespace Mutate {
     //TODO: Use a byte approach.
-    char mutateChar(char c);
 
     class Mutator {
         public:
@@ -28,5 +27,7 @@ namespace Mutate {
             std::filesystem::path outputFilePath;
             double mutationProbability;
             UTF8::Utf8Parser decoder;
+
+            uint32_t mutateChar(uint32_t c);
     };
 }

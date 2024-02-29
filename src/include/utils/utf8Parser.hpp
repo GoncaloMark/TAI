@@ -29,10 +29,17 @@ namespace UTF8 {
         void readFile(std::filesystem::path filePath);
 
         /// @brief Prints the hexadecimal code points stored in the unordered_set.
-        void printCodePoints() {
+        void printAlphabet() {
             for (const auto& character : characters) {
                 std::cout << "0x" << std::hex << character << std::endl;
             }
+        }
+
+        //TODO MAKE THIS RETURN A REFERENCE OR SOMETHING SO IT DOESNT COPY!
+        /// @brief Getter for the alphabet.
+        /// @return Alphabet unordered_set.
+        std::unordered_set<uint32_t> getAlphabet(){
+            return characters;
         }
 
         private:

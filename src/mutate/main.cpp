@@ -20,5 +20,11 @@ int main(int argc, char** argv){
     std::filesystem::path inputFileName = parser.GetArgValue<std::filesystem::path>("--inputFileName");
     std::filesystem::path outputFileName = parser.GetArgValue<std::filesystem::path>("--outputFileName");
 
+    UTF8::Utf8Parser decoder(1024);
+
+    Mutate::Mutator mutate(inputFileName, outputFileName, prob, decoder);
+    mutate.ReadAlphabet();
+    mutate.MutateFile();
+
     return EXIT_SUCCESS;
 }

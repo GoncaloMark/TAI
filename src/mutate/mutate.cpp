@@ -1,11 +1,16 @@
 #include "mutate.hpp"
 
 namespace Mutate{
-    char mutateChar(char c){
-        char chars[] = {'A', 'C', 'G', 'T'};
-        char newChar = chars[rand() % 4];
+    uint32_t Mutator::mutateChar(uint32_t c){
+        std::vector<uint32_t> alphabetVec(decoder.getAlphabet().begin(), decoder.getAlphabet().begin());
+
+        if (alphabetVec.size() <= 1) {
+            return c;
+        }
+
+        uint32_t newChar = alphabetVec[rand() % alphabetVec.size()];
         while (newChar == c) {
-            newChar = chars[rand() % 4];
+            newChar = alphabetVec[rand() % alphabetVec.size()];
         }
         return newChar;
     }
@@ -15,14 +20,15 @@ namespace Mutate{
     }
 
     void Mutator::PrintAlphabet(){
-        decoder.printCodePoints();
+        decoder.printAlphabet();
     }
 
+    //TODO: Fix the encoding and decoding of characters in real time for the mutation!
     void Mutator::MutateFile(){
         // Seed the randomness
         srand(static_cast<unsigned>(time(nullptr)));
 
-        const size_t bufferSize = 1024; 
+        const size_t bufferSize = 1024;
         char buffer[bufferSize];
         
         std::stringstream sequenceStream;
@@ -49,8 +55,8 @@ namespace Mutate{
             while (fileSource.read(buffer, bufferSize) || fileSource.gcount() > 0) {
                 for (std::streamsize i = 0; i < fileSource.gcount(); ++i) {
                     double rnd = static_cast<double>(rand()) / RAND_MAX;
-                    if (rnd < mutationProbability && (buffer[i] == 'A' || buffer[i] == 'C' || buffer[i] == 'G' || buffer[i] == 'T')) {
-                        buffer[i] = Mutate::mutateChar(buffer[i]);
+                    if (rnd < mutationProbability && decoder.getAlphabet().find(static_cast<uint32_t>(buffer[i])) != decoder.getAlphabet().end()) {
+                        buffer[i] = Mutate::Mutator::mutateChar(buffer[i]);
                     }
                 }
                 fileOutput.write(buffer, fileSource.gcount());
