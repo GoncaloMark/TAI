@@ -51,7 +51,7 @@ int main(int argc, char** argv){
             for (std::streamsize i = 0; i < fileSource.gcount(); ++i) {
                 double rnd = static_cast<double>(rand()) / RAND_MAX;
                 if (rnd < prob && (buffer[i] == 'A' || buffer[i] == 'C' || buffer[i] == 'G' || buffer[i] == 'T')) {
-                    buffer[i] = mutateChar(buffer[i]);
+                    buffer[i] = Mutate::mutateChar(buffer[i]);
                 }
             }
             fileOutput.write(buffer, fileSource.gcount());

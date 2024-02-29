@@ -1,7 +1,7 @@
 OUTPUT_DIR := bin
 
 #* INCLUDE OBJS
-INCLUDE_SRC := src/include/argparser/argparser.cpp src/include/utils/utils.cpp
+INCLUDE_SRC := src/include/argparser/argparser.cpp src/include/utils/utils.cpp src/include/utils/utf8Parser.cpp
 INCLUDE_C_OBJS := $(INCLUDE_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* CPM
