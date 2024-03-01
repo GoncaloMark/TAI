@@ -53,4 +53,21 @@ namespace UTF8 {
 
             file.close();
         }
+
+        std::string Utf8Parser::encodeUtf8(uint32_t character){
+            std::stringstream ss;
+            if (character & 0xFF000000) {  // Most significant byte (leftmost)
+                ss << static_cast<char>((character & 0xFF000000) >> 24);
+            }
+            if (character & 0x00FF0000) {
+                ss << static_cast<char>((character & 0x00FF0000) >> 16);
+            }
+            if (character & 0x0000FF00) {
+                ss << static_cast<char>((character & 0x0000FF00) >> 8);
+            }
+            if (character & 0x000000FF) {  // Least significant byte (rightmost)
+                ss << static_cast<char>(character & 0x000000FF);
+            }
+            return ss.str();
+        }
 }

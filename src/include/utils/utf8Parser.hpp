@@ -35,6 +35,11 @@ namespace UTF8 {
             }
         }
 
+        /// @brief Function to encode the hexadecimal back to UTF8
+        /// @param character character to be encoded.
+        /// @return std::string representing the encoded character.
+        std::string encodeUtf8(uint32_t character);
+
         //TODO MAKE THIS RETURN A REFERENCE OR SOMETHING SO IT DOESNT COPY!
         /// @brief Getter for the alphabet.
         /// @return Alphabet unordered_set.
@@ -42,20 +47,20 @@ namespace UTF8 {
             return characters;
         }
 
+        /// @brief Private method to get the size in bytes of the character being read.
+        /// @param ch Character to be analysed.
+        /// @return Returns a size_t representing size in bytes of character.
+        size_t getUtf8CharLength(char ch) {
+            unsigned char byte = ch;
+            if ((byte & 0x80) == 0) return 1; // 0xxxxxxx
+            if ((byte & 0xE0) == 0xC0) return 2; // 110xxxxx
+            if ((byte & 0xF0) == 0xE0) return 3; // 1110xxxx
+            if ((byte & 0xF8) == 0xF0) return 4; // 11110xxx
+            return 1; // Default to 1 for continuation bytes or in case of invalid input
+        }
+
         private:
             std::unordered_set<uint32_t> characters;
             size_t bufferSize;
-
-            /// @brief Private method to get the size in bytes of the character being read.
-            /// @param ch Character to be analysed.
-            /// @return Returns a size_t representing size in bytes of character.
-            size_t getUtf8CharLength(char ch) {
-                unsigned char byte = ch;
-                if ((byte & 0x80) == 0) return 1; // 0xxxxxxx
-                if ((byte & 0xE0) == 0xC0) return 2; // 110xxxxx
-                if ((byte & 0xF0) == 0xE0) return 3; // 1110xxxx
-                if ((byte & 0xF8) == 0xF0) return 4; // 11110xxx
-                return 1; // Default to 1 for continuation bytes or in case of invalid input
-            }
     };
 }

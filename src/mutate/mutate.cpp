@@ -2,7 +2,7 @@
 
 namespace Mutate{
     uint32_t Mutator::mutateChar(uint32_t c){
-        std::vector<uint32_t> alphabetVec(decoder.getAlphabet().begin(), decoder.getAlphabet().begin());
+        std::vector<uint32_t> alphabetVec(decoder.getAlphabet().begin(), decoder.getAlphabet().end());
 
         if (alphabetVec.size() <= 1) {
             return c;
@@ -23,53 +23,43 @@ namespace Mutate{
         decoder.printAlphabet();
     }
 
-    //TODO: Fix the encoding and decoding of characters in real time for the mutation!
     void Mutator::MutateFile(){
-        // Seed the randomness
         srand(static_cast<unsigned>(time(nullptr)));
 
         const size_t bufferSize = 1024;
-        char buffer[bufferSize];
-        
-        std::stringstream sequenceStream;
+        std::vector<char> buffer(bufferSize);
+        std::ifstream fileSource(inputFilePath, std::ifstream::binary);
+        std::ofstream fileOutput(outputFilePath, std::ofstream::binary);
 
-        std::ifstream fileSource;
-        std::ofstream fileOutput;
-
-        fileSource.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        fileOutput.exceptions(std::ofstream::failbit | std::ofstream::badbit);
-
-        try {
-            fileSource.open(inputFilePath, std::ifstream::binary);
-            if (!fileSource.is_open()) {
-                std::cerr << "ERROR::SOURCE::FILE_NOT_SUCCESFULLY_OPENED" << '\n';
-                throw std::ios_base::failure("ERROR::SOURCE::FILE_NOT_SUCCESFULLY_OPENED");
-            }
-
-            fileOutput.open(outputFilePath, std::ofstream::binary);
-            if (!fileOutput.is_open()) {
-                std::cerr << "ERROR::OUTPUT::FILE_NOT_SUCCESFULLY_OPENED" << '\n';
-                throw std::ios_base::failure("ERROR::OUTPUT::FILE_NOT_SUCCESFULLY_OPENED");
-            }
-
-            while (fileSource.read(buffer, bufferSize) || fileSource.gcount() > 0) {
-                for (std::streamsize i = 0; i < fileSource.gcount(); ++i) {
-                    double rnd = static_cast<double>(rand()) / RAND_MAX;
-                    if (rnd < mutationProbability && decoder.getAlphabet().find(static_cast<uint32_t>(buffer[i])) != decoder.getAlphabet().end()) {
-                        buffer[i] = Mutate::Mutator::mutateChar(buffer[i]);
-                    }
-                }
-                fileOutput.write(buffer, fileSource.gcount());
-                if (fileSource.peek() == EOF) break;
-            }
-
-            std::cout << "Successfully Mutated " << inputFilePath << " File" << std::endl;
-        } catch (const std::ios_base::failure& e) {
-            std::cerr << "ERROR::INPUT_FILE_NOT_SUCCESFULLY_PROCESSED::" << e.what() << '\n';
-            fileSource.close();
-            fileOutput.close();
+        if (!fileSource.is_open() || !fileOutput.is_open()) {
+            std::cerr << "ERROR::FILE_NOT_SUCCESFULLY_OPENED" << '\n';
             exit(EXIT_FAILURE);
         }
+
+        while (fileSource.read(buffer.data(), bufferSize) || fileSource.gcount() > 0) {
+            std::streamsize count = fileSource.gcount();
+            std::string outputBuffer; // Use a string to accumulate output
+
+            for (std::streamsize i = 0; i < count; ) {
+                double rnd = static_cast<double>(rand()) / RAND_MAX;
+                size_t len = decoder.getUtf8CharLength(buffer[i]);
+                std::string utf8Char(buffer.begin() + i, buffer.begin() + i + len);
+
+                uint32_t hexChar = UTF8::utf8ToHex(utf8Char);
+
+                if (rnd < mutationProbability && decoder.getAlphabet().find(UTF8::utf8ToLower(hexChar)) != decoder.getAlphabet().end()) {
+                    uint32_t mutatedHexChar = mutateChar(hexChar);
+                    utf8Char = decoder.encodeUtf8(mutatedHexChar);
+                }
+
+                outputBuffer += utf8Char; // Append the original or mutated character
+                i += len; // Move to the next character
+            }
+
+            fileOutput.write(outputBuffer.data(), outputBuffer.size());
+        }
+
+        std::cout << "Successfully Mutated " << inputFilePath << " File" << std::endl;
 
         fileSource.close();
         fileOutput.close();
