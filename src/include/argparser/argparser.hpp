@@ -63,7 +63,7 @@ namespace ArgParser {
                 if (argsMap.find(argKey) != argsMap.end()) {
                     return std::get<T>(argsMap[argKey].value);
                 }
-                throw std::runtime_error("Argument not found");
+                throw std::runtime_error("Argument not found: " + argKey);
             }
 
         private:

@@ -4,14 +4,13 @@
 #include <stdlib.h>
 #include <unordered_set>
 #include <cstdint>
+#include "utils/parser.hpp"
 #include "utils/utf8Parser.hpp"
 
 namespace Mutate {
-    //TODO: Use a byte approach.
-
     class Mutator {
         public:
-            Mutator(std::filesystem::path inputFilePath, std::filesystem::path outputFilePath, double mutationProbability, UTF8::Utf8Parser utf8Decoder) : inputFilePath(inputFilePath), outputFilePath(outputFilePath), mutationProbability(mutationProbability), decoder(utf8Decoder){};
+            Mutator(std::filesystem::path inputFilePath, std::filesystem::path outputFilePath, double mutationProbability, Parser& decoder) : inputFilePath(inputFilePath), outputFilePath(outputFilePath), mutationProbability(mutationProbability), decoder(decoder){};
 
             /// @brief Mutates the input file outputting to output file.
             void MutateFile();
@@ -26,7 +25,7 @@ namespace Mutate {
             std::filesystem::path inputFilePath;
             std::filesystem::path outputFilePath;
             double mutationProbability;
-            UTF8::Utf8Parser decoder;
+            Parser& decoder;
 
             uint32_t mutateChar(uint32_t c);
     };

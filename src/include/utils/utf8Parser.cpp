@@ -1,23 +1,16 @@
 #include "utf8Parser.hpp"
 
 namespace UTF8 {
-    uint32_t utf8ToHex(const std::string& utf8) {
-        std::vector<unsigned char> bytes(utf8.begin(), utf8.end());
+    uint32_t Utf8Parser::toHex(const std::string& character) {
+        std::vector<unsigned char> bytes(character.begin(), character.end());
         uint32_t hex = 0;
         size_t numBytes = bytes.size();
         for (size_t i = 0; i < numBytes; ++i) {
             if (i >= 4) break;
 
-            hex = (hex << 8) | (static_cast<uint8_t>(utf8[i]) & 0xFF);
+            hex = (hex << 8) | (static_cast<uint8_t>(character[i]) & 0xFF);
         }
         return hex;
-    }
-
-    uint32_t utf8ToLower(uint32_t utf8){
-        if ((utf8 >= 'A') && (utf8 <= 'Z')) return (utf8 | 0x20);
-        if ((utf8 >= 0xC380) && (utf8 <= 0xC39A) && (utf8 != 0xC397)) return (utf8 | 0x20);
-
-        return utf8;
     }
 
     void Utf8Parser::readFile(std::filesystem::path filePath) {
@@ -36,7 +29,7 @@ namespace UTF8 {
                 size_t i = 0;
                 while (i < chunk.size()) {
                     size_t start = i;
-                    size_t len = getUtf8CharLength(chunk[i]);
+                    size_t len = getCharLength(chunk[i]);
                     
                     if (i + len > chunk.size()) {
                         leftover = chunk.substr(start);
@@ -44,8 +37,8 @@ namespace UTF8 {
                     }
 
                     std::string utf8Char = chunk.substr(start, len);
-                    uint32_t hex = utf8ToHex(utf8Char);
-                    characters.insert(utf8ToLower(hex));
+                    uint32_t hex = toHex(utf8Char);
+                    characters.insert(hex);
 
                     i += len;
                 }
@@ -54,7 +47,7 @@ namespace UTF8 {
             file.close();
         }
 
-        std::string Utf8Parser::encodeUtf8(uint32_t character){
+        std::string Utf8Parser::encode(uint32_t character){
             std::stringstream ss;
             if (character & 0xFF000000) {  // Most significant byte (leftmost)
                 ss << static_cast<char>((character & 0xFF000000) >> 24);

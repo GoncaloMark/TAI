@@ -42,17 +42,17 @@ namespace Mutate{
 
             for (std::streamsize i = 0; i < count; ) {
                 double rnd = static_cast<double>(rand()) / RAND_MAX;
-                size_t len = decoder.getUtf8CharLength(buffer[i]);
-                std::string utf8Char(buffer.begin() + i, buffer.begin() + i + len);
+                size_t len = decoder.getCharLength(buffer[i]);
+                std::string decodedChar(buffer.begin() + i, buffer.begin() + i + len);
 
-                uint32_t hexChar = UTF8::utf8ToHex(utf8Char);
+                uint32_t hexChar = decoder.toHex(decodedChar);
 
-                if (rnd < mutationProbability && decoder.getAlphabet().find(UTF8::utf8ToLower(hexChar)) != decoder.getAlphabet().end()) {
+                if (rnd < mutationProbability && decoder.getAlphabet().find(hexChar) != decoder.getAlphabet().end()) {
                     uint32_t mutatedHexChar = mutateChar(hexChar);
-                    utf8Char = decoder.encodeUtf8(mutatedHexChar);
+                    decodedChar = decoder.encode(mutatedHexChar);
                 }
 
-                outputBuffer += utf8Char; // Append the original or mutated character
+                outputBuffer += decodedChar; // Append the original or mutated character
                 i += len; // Move to the next character
             }
 

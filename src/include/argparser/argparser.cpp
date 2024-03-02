@@ -12,12 +12,6 @@ namespace ArgParser{
     }
 
     void ArgParser::ParseArgs() {
-        if (argc == 0) {
-            std::cerr << "No arguments were entered." << std::endl;
-            ArgParser::ShowHelp();
-            exit(EXIT_FAILURE);
-        }
-
         try {
             for (int i = 0; i < argc; ++i) {
                 std::string argKey = argv[i];
