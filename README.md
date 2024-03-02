@@ -14,23 +14,23 @@ Trabalho de Teoria Algorítmica da informação
 
 This section contains steps that one can use to get their own copy of our programs.
 
-- firstly, fork this repository using the fork button on the top right corner of the page to get your own copy of the repository. This is to ensure that you can actively experiment with the code of the project.
+- Start by forking this repository using the fork button at the top right corner of the page to get your own copy of the repository. This is to ensure that you can actively experiment with the code of the project.
 
-- secondly, once you have the fork, you can clone the repository to your local machine using the following command:
+- Once the repository has been forked, you can clone the repository to your local machine using the following command:
 
-```bash
-git clone <paste URL of the forked repo here>
-```
+	```bash
+	git clone <paste URL of the forked repo here>
+	```
 
-- thirdly, once you have cloned the repository, you can navigate to the directory of the repository and run the following command to compile the code:
+- Lastly, with the repository cloned, you can navigate to the directory of the repository and run the following command to compile the code:
 
     ```bash
     make all
     ```
 
-    Remember to get chry.txt
+    Remember to get 'chry.txt'
 
-This will create the executables by compiling and linking the project. We can now test and run the appropriate shell script in there to test the programs.
+This will create the executables by compiling and linking the project. You can now test and run the appropriate shell script to test the programs.
 
 - **Note:** The use of a Linux based system is recommended.
 
