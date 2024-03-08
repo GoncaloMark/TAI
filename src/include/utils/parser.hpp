@@ -10,7 +10,7 @@ class Parser {
     public:
         Parser(size_t bufferSize) : bufferSize(bufferSize) {};
 
-        virtual void readFile(std::filesystem::path filePath) = 0;
+        virtual void readAlphabet(std::filesystem::path filePath) = 0;
         virtual void printAlphabet() = 0;
         virtual std::string encode(uint32_t character) = 0;
         virtual const std::unordered_set<uint32_t>& getAlphabet() const = 0;

@@ -33,7 +33,6 @@ int main(int argc, char** argv){
     UTF8::Utf8Parser decoder(1024);
 
     Mutate::Mutator mutate(inputFileName, outputFileName, prob, decoder);
-    mutate.ReadAlphabet();
     mutate.MutateFile();
 
     return EXIT_SUCCESS;

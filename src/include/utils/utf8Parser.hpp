@@ -18,7 +18,7 @@ namespace UTF8 {
 
             /// @brief Reads and parses the file to get the alphabet (unique characters) into an unordered_set.
             /// @param filePath Path to file in the system.
-            void readFile(std::filesystem::path filePath) override;
+            void readAlphabet(std::filesystem::path filePath) override;
 
             /// @brief Prints the hexadecimal code points stored in the unordered_set.
             void printAlphabet() override {

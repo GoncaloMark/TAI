@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include "../include/argparser/argparser.hpp"
+#include "cpm.hpp"
 
 int main(int argc, char** argv){
     argc--;
@@ -16,30 +17,24 @@ int main(int argc, char** argv){
 
     parser.ParseArgs();
 
-    int k = parser.GetArgValue<int>("--k");
-    double alpha = parser.GetArgValue<double>("--alpha");
-    double threshold = parser.GetArgValue<double>("--threshold");
-    std::filesystem::path inputFileName = parser.GetArgValue<std::filesystem::path>("--inputFileName");
-
-    std::ifstream fileSource;
-    // Turn the exceptions bit on
-    fileSource.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-    std::string sequence;
+    int k;
+    double alpha;
+    double threshold;
+    std::filesystem::path inputFileName;
 
     try{
-        std::stringstream sequenceStream;
-
-        fileSource.open(inputFileName);
-        //TODO: Do not read the whole file into stack memory
-        sequenceStream << fileSource.rdbuf();
-        fileSource.close();
-
-        sequence = sequenceStream.str();
-    } catch(const std::ifstream::failure& e){
-        std::cerr << "ERROR::SOURCE::FILE_NOT_SUCCESFULLY_READ" << '\n';
+        k = parser.GetArgValue<int>("--k");
+        alpha = parser.GetArgValue<double>("--alpha");
+        threshold = parser.GetArgValue<double>("--threshold");
+        inputFileName = parser.GetArgValue<std::filesystem::path>("--inputFileName");
+    } catch(const std::runtime_error& e){
+        std::cerr << "Error missing arguments: " << e.what() << std::endl;
+        parser.ShowHelp();
         return EXIT_FAILURE;
     }
+
+    UTF8::Utf8Parser decoder(1024);
+
 
     std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
     return 0;

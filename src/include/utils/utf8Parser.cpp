@@ -13,7 +13,7 @@ namespace UTF8 {
         return hex;
     }
 
-    void Utf8Parser::readFile(std::filesystem::path filePath) {
+    void Utf8Parser::readAlphabet(std::filesystem::path filePath) {
             std::ifstream file(filePath, std::ios::binary);
             if (!file) {
                 std::cerr << "Failed to open file: " << filePath << std::endl;

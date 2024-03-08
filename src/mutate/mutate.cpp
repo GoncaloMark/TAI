@@ -15,15 +15,12 @@ namespace Mutate{
         return newChar;
     }
 
-    void Mutator::ReadAlphabet(){
-        decoder.readFile(inputFilePath);
-    }
-
     void Mutator::PrintAlphabet(){
         decoder.printAlphabet();
     }
 
     void Mutator::MutateFile(){
+        decoder.readAlphabet(inputFilePath);
         srand(static_cast<unsigned>(time(nullptr)));
 
         const size_t bufferSize = 1024;

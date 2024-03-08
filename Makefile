@@ -18,7 +18,7 @@ MUTATE_C_OBJS := $(MUTATE_C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* COMPILER STUFF
 CCOMPILER := g++
-CFLAGS := -c -O2 -Wall -Werror -ggdb -c -I"./src/include" 
+CFLAGS := -c -O3 -Wall -Werror -I"./src/include" 
 
 #* TARGETS
 all: clean cpm mutate

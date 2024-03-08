@@ -7,7 +7,10 @@
 #include <functional>
 
 namespace ArgParser {
+    /// @brief Variant of the values an Argument might take in the map.
     using ArgValue = std::variant<int, double, std::filesystem::path>;
+
+    /// @brief Argument map type alias.
     using ArgTypeMap = std::unordered_map<std::string, std::string>;
 
     /// @struct
