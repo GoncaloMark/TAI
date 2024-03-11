@@ -4,3 +4,6 @@ chry.txt
 .idea/
 mutated_chry.txt
 example/
+# Clion
+CMakeLists.txts
+cmake-build-debug/
