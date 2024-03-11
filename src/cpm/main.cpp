@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include "../include/argparser/argparser.hpp"
+#include "../include/utils/Utf8Reader.hpp"
 #include "cpm.hpp"
 
 int main(int argc, char** argv){
@@ -33,7 +34,20 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    UTF8::Utf8Parser decoder(1024);
+    //UTF8::Utf8Parser decoder(1024);
+
+    UTF8::Utf8Reader reader(inputFileName);
+    std::string symbol;
+    reader.openFile();
+    while(!reader.isEndOfFile()) {
+        symbol = reader.getNextCharacter();
+        if(reader.isEndOfFile()) {
+            break;
+        }
+        std::cout << "->" << symbol << std::endl;
+    }
+    reader.closeFile();
+    std::cout << "----------------------" << std::endl;
 
 
     std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
