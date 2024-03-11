@@ -5,5 +5,5 @@ chry.txt
 mutated_chry.txt
 example/
 # Clion
-CMakeLists.txts
+CMakeLists.txt
 cmake-build-debug/
