@@ -37,10 +37,36 @@ namespace cbuffer {
         };
 
         // Add an item to this circular buffer.
-        void enqueue(T item);
+        void enqueue(T item) {
+            if (isFull()) { // if buffer is full, throw an error
+                throw std::runtime_error("buffer is full");
+            }
+
+            // insert item at back of buffer
+            buffer[tail] = item;
+            // increment tail &  increase _size by 1
+            tail = (tail + 1) % maxSize;
+            _size++;
+        };
 
         // Remove an item from this circular buffer and return it.
-        T dequeue();
+        T dequeue() {
+            // if buffer is empty, throw an error
+            if (isEmpty()) {
+                throw std::runtime_error("buffer is empty");
+            }
+
+            // get item at head
+            T item = buffer[head];
+            // set item at head to be empty
+            buffer[head] = empty_item;
+            // move head forward & decrease _size by 1
+            head = (head + 1) % maxSize;
+            _size--;
+
+            // return item
+            return item;
+        };
 
         // removes an element to insert a new one
         void update(T item) {
@@ -49,7 +75,16 @@ namespace cbuffer {
         };
 
         // Return a list of all its elements
-        std::list<T> toList();
+        std::vector<T> toList() {
+            size_t tmp_head;
+            size_t count;
+            std::vector<T> items;
+            for(tmp_head = head, count = 0; count < this->size(); tmp_head = (tmp_head + 1) % maxSize, count++)
+            {
+                items.push_back(buffer[tmp_head]);
+            }
+            return items;
+        };
 
         // Return the item at the front of this circular buffer.
         T front() {
