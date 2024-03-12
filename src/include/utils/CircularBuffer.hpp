@@ -98,7 +98,7 @@ namespace cbuffer {
 
         // Return true if this circular buffer is full, and false otherwise.
         bool isFull() {
-            return _size;
+            return _size == maxSize;
         };
 
         // Return the size of this circular buffer.
