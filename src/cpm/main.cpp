@@ -3,6 +3,8 @@
 #include <sstream>
 #include "../include/argparser/argparser.hpp"
 #include "../include/utils/Utf8Reader.hpp"
+#include "../include/utils/CircularBuffer.hpp"
+#include "../include/utils/utf8Character.hpp"
 #include "cpm.hpp"
 
 int main(int argc, char** argv){
@@ -34,20 +36,37 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
+    UTF8::Utf8Character symbol;
+    UTF8::Utf8Reader reader(inputFileName);
+    cbuffer::CircularBuffer<UTF8::Utf8Character> buffer(k);
     //UTF8::Utf8Parser decoder(1024);
 
-    UTF8::Utf8Reader reader(inputFileName);
-    std::string symbol;
+
+    // get first char
+    symbol = reader.getFirstChar();
+
+
+    // fill buffer with first char
+    for(int i=0;i<k;i++){
+        buffer.enqueue(symbol);
+        std::cout << buffer.size() << std::endl;
+    }
+
+    std::cout << "First token: " << UTF8::Utf8Character::convertToStr(buffer.toList()) << std::endl;
+    std::cout << "----------------------" << std::endl;
+
     reader.openFile();
     while(!reader.isEndOfFile()) {
         symbol = reader.getNextCharacter();
         if(reader.isEndOfFile()) {
             break;
         }
-        std::cout << "->" << symbol << std::endl;
+        std::cout << UTF8::Utf8Character::convertToStr(buffer.toList()) << "->" << symbol.getCharacter() << " - " << symbol.getPosition() << std::endl;
+        buffer.update(symbol);
     }
     reader.closeFile();
     std::cout << "----------------------" << std::endl;
+    std::cout << "Last token: " << UTF8::Utf8Character::convertToStr(buffer.toList()) << std::endl;
 
 
     std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
