@@ -33,11 +33,6 @@ namespace cbuffer {
         return item;
     }
 
-    template<class T> void CircularBuffer<T>::update(T item) {
-        (void) this->dequeue();
-        this->enqueue(item);
-    }
-
     template<class T> std::list<T> CircularBuffer<T>::toList() {
         size_t tmp_head;
         size_t count;

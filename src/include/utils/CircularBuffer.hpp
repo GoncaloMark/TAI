@@ -43,7 +43,10 @@ namespace cbuffer {
         T dequeue();
 
         // removes an element to insert a new one
-        void update(T item);
+        void update(T item) {
+            (void) this->dequeue();
+            this->enqueue(item);
+        };
 
         // Return a list of all its elements
         std::list<T> toList();
