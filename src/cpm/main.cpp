@@ -5,7 +5,7 @@
 #include "../include/utils/Utf8Reader.hpp"
 #include "../include/utils/CircularBuffer.hpp"
 #include "../include/utils/utf8Character.hpp"
-#include "../include/cpm.hpp"
+#include "../include/cpm2.hpp"
 
 int main(int argc, char** argv){
     argc--;
@@ -37,7 +37,7 @@ int main(int argc, char** argv){
     }
 
     UTF8::Utf8Parser decoder(1024);
-    CPM::CopyModel copyModel(inputFileName, alpha, threshold, k, decoder);
+    CPM::CopyModel2 copyModel(inputFileName, alpha, threshold, k, decoder);
     copyModel.process();
 
 
