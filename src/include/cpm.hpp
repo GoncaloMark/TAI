@@ -4,14 +4,15 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <cstdint>
-#include <utility>
 #include "utils/parser.hpp"
 #include "utils/utf8Parser.hpp"
-#include "utils/CircularBuffer.hpp"
-#include "utils/Utf8Reader.hpp"
 
 namespace CPM {
     class CopyModel {
+    public:
+        CopyModel(std::filesystem::path inputFilePath, double alpha, double threshold, int k, Parser& decoder) : inputFilePath(inputFilePath), alpha(alpha), threshold(threshold), kmerSize(k), decoder(decoder){};
+
+        void startCompression();
 
         //TODO USE DOUBLE BUFFER IMPLEMENTATION.
     private:
@@ -51,43 +52,5 @@ namespace CPM {
         };
 
         void predict(uint32_t symbol) const;
-
-        public:
-            CopyModel(std::filesystem::path inputFilePath, double alpha, double threshold, int k, Parser& decoder) : inputFilePath(std::move(inputFilePath)), alpha(alpha), threshold(threshold), kmerSize(k), decoder(decoder){};
-
-            void startCompression();
-
-            void process() {
-                UTF8::Utf8Character symbol;
-                UTF8::Utf8Reader reader(inputFilePath);
-                cbuffer::CircularBuffer<UTF8::Utf8Character> buffer(kmerSize);
-
-
-                // get first char
-                symbol = reader.getFirstChar();
-
-                // fill buffer with first char
-                for(int i=0;i<kmerSize;i++){
-                    buffer.enqueue(symbol);
-                    std::cout << buffer.size() << std::endl;
-                }
-
-                std::cout << "First token: " << UTF8::Utf8Character::convertToStr(buffer.toList()) << std::endl;
-                std::cout << "----------------------" << std::endl;
-
-                reader.openFile();
-                while(!reader.isEndOfFile()) {
-                    symbol = reader.getNextCharacter();
-                    if(reader.isEndOfFile()) {
-                        break;
-                    }
-                    std::cout << UTF8::Utf8Character::convertToStr(buffer.toList()) << "->" << symbol.getCharacter() << " - " << symbol.getPosition() << std::endl;
-                    buffer.update(symbol);
-                }
-                reader.closeFile();
-                std::cout << "----------------------" << std::endl;
-                std::cout << "Last token: " << UTF8::Utf8Character::convertToStr(buffer.toList()) << std::endl;
-            };
-
     };
 }
