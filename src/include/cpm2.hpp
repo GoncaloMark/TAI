@@ -9,98 +9,106 @@
 #include "utils/utf8Parser.hpp"
 #include "utils/CircularBuffer.hpp"
 #include "utils/Utf8Reader.hpp"
+#include "utils/utils2.hpp"
 
 namespace CPM {
     class CopyModel2 {
 
-        //TODO USE DOUBLE BUFFER IMPLEMENTATION.
+    public:
+        CopyModel2(std::filesystem::path inputFilePath, double alpha, double threshold, int k) :
+                inputFilePath(std::move(inputFilePath)),
+                alpha(alpha),
+                threshold(threshold),
+                kmerSize(k) {};
+
+        void process() {
+            this->reader = UTF8::Utf8Reader(this->inputFilePath);
+            this->buffer = cbuffer::CircularBuffer<UTF8::Utf8Character>(this->kmerSize);
+            finalHitProbability = 0.0;
+            nHits = nFails = count = 0;
+
+            initialise();
+
+            while(true) {
+                symbol = reader.getNextCharacter();
+                if(reader.isEndOfFile()) {
+                    break;
+                }
+
+                if(!positions[kmer].empty())
+                {
+                    if(symbol.getCharacter() == predict()) {
+                        nHits++;
+                    } else {
+                        nFails++;
+                    }
+                }
+                finalHitProbability += UTILS::calculateHitProbability(nHits, nFails, alpha);
+                if(isPrecise()) {
+                    resetModel();
+                }
+
+                updatePositions();
+
+                count++;
+                buffer.update(symbol);
+                kmer = UTF8::Utf8Character::convertToStr(buffer.toList());
+            }
+            reader.closeFile();
+
+            std::cout << "End: " << finalHitProbability/count << std::endl;
+        };
+
     private:
         std::filesystem::path inputFilePath;
-        int kmerSize;
         double alpha;
         double threshold;
+        int kmerSize;
 
         cbuffer::CircularBuffer<UTF8::Utf8Character> buffer;
-        std::string curKmer;
-        UTF8::Utf8Character curSymbol;
+        std::string kmer;
+        UTF8::Utf8Character symbol;
         uint32_t nHits;
         uint32_t nFails;
+        uint32_t count;
 
-        std::unordered_map<std::string, uint32_t> positions;
-        std::unordered_map<std::string, std::vector<uint32_t>> nextCharPositions;
+        std::unordered_map<std::string, std::vector<uint32_t>> positions;
         double finalHitProbability;
         size_t totalBits;
 
         UTF8::Utf8Reader reader;
-        //TODO Refactor decoder to get byte sequence of length K.
-        Parser& decoder;
 
-        /// @brief Private method for finding kmer in the hashtable.
-        /// @param kmer String reference for a given kmer.
-        /// @return Position in buffer.
-        uint32_t getKmer(std::string& kmer) const {
-            uint32_t pos;
-            try{
-                pos = positions.at(kmer);
-            } catch(std::exception& e){
-                pos = 0;
-            }
-
-            return pos;
+        std::string predict() {
+            std::vector<uint32_t> kmerPositions = positions[kmer];
+            uint32_t chosenPos = kmerPositions.at(0);
+            std::string predictedSym = reader.getCharAt(chosenPos).getCharacter();
+            return predictedSym;
         };
 
         /// @brief This private method tests the precision of our copy model
         /// @return True if model is being precise, False if model is being imprecise over threshold.
-        bool precision() const {
-            return ((nHits / (nHits + nFails)) * 100) < threshold;
+        bool isPrecise() const {
+            return ( ((nHits + alpha)/(nHits + nFails + 2*alpha)) * 100) < threshold;
         };
 
-        void predict(uint32_t symbol) const;
-
-        bool prediction(std::string kmer, UTF8::Utf8Character symbol) {
-            return false;
-        }
+        void updatePositions() {
+            positions[kmer].push_back(symbol.getPosition());
+        };
 
         void initialise() {
-            /// Initialise
-            finalHitProbability = 0.0;
-            nHits = nHits = 0;
             /// -> Get first Kmer
-            /// -> Set file position(optional)
-            curSymbol = reader.getFirstChar();
+            symbol = reader.getFirstChar();
             for(int i=0;i<kmerSize;i++){
-                buffer.enqueue(curSymbol);
+                buffer.enqueue(symbol);
             }
-            curKmer = UTF8::Utf8Character::convertToStr(buffer.toList());
+            kmer = UTF8::Utf8Character::convertToStr(buffer.toList());
+            /// -> Set file position(optional)
             reader.openFile();
         };
 
-    public:
-        CopyModel2(std::filesystem::path inputFilePath, double alpha, double threshold, int k, Parser& decoder) :
-                inputFilePath(std::move(inputFilePath)),
-                alpha(alpha),
-                threshold(threshold),
-                kmerSize(k),
-                decoder(decoder) {
-            this->reader = UTF8::Utf8Reader(this->inputFilePath);
-            this->buffer = cbuffer::CircularBuffer<UTF8::Utf8Character>(this->kmerSize);
-        };
-
-        void startCompression();
-
-        void process() {
-            initialise();
-
-            while(!reader.isEndOfFile()) {
-                curSymbol = reader.getNextCharacter();
-                if(reader.isEndOfFile()) {
-                    break;
-                }
-                buffer.update(curSymbol);
-                curKmer = UTF8::Utf8Character::convertToStr(buffer.toList());
-            }
-
-            reader.closeFile();
+        void resetModel() {
+            nHits = 0;
+            nFails = 0;
         };
 
     };
