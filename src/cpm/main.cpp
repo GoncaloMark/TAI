@@ -37,7 +37,7 @@ int main(int argc, char** argv){
     }
 
     UTF8::Utf8Parser decoder(1024);
-    CPM::CopyModel2 copyModel(inputFileName, alpha, threshold, k, decoder);
+    CPM::CopyModel2 copyModel(inputFileName, alpha, threshold, k);
     copyModel.process();
 
 
