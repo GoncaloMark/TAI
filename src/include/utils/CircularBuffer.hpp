@@ -27,6 +27,8 @@ namespace cbuffer {
         // CircularBuffer - Public Methods
         //---------------------------------------------------------------
 
+        explicit CircularBuffer<T>() = default;
+
         // Create a new CircularBuffer.
         explicit CircularBuffer<T>(size_t maxSize) {
             this->buffer = std::unique_ptr<T[]>(new T[maxSize]);
