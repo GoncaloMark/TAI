@@ -25,8 +25,27 @@ namespace UTF8 {
         explicit Utf8Reader() = default;
         explicit Utf8Reader(std::filesystem::path filePath): filePath(std::move(filePath)) {};
 
-        bool isOpen() {
+        bool isOpen() const {
             return file.is_open();
+        };
+
+        bool isEndOfFile() const {
+            if(!isOpen()) {
+                return false;
+            }
+            return file.eof();
+        };
+
+        uint32_t getCurPos() {
+            return file.tellg();
+        };
+
+        void goToPos(uint32_t position) {
+            file.seekg(position, std::ifstream::beg);
+        };
+
+        void closeFile() {
+            file.close();
         };
 
         void openFile() {
@@ -90,17 +109,6 @@ namespace UTF8 {
 
         };
 
-        bool isEndOfFile() {
-            if(!isOpen()) {
-                return false;
-            }
-            return file.eof();
-        };
-
-        void closeFile() {
-            file.close();
-        };
-
         Utf8Character getCharAt(uint32_t position) {
             Utf8Character character;
             unsigned int curPosition;
@@ -145,14 +153,6 @@ namespace UTF8 {
                 closeFile();
             }
             return fileSize;
-        };
-
-        uint32_t getCurPos() {
-            return file.tellg();
-        };
-
-        void goToPos(uint32_t position) {
-            file.seekg(position, std::ifstream::beg);
         };
 
     };
