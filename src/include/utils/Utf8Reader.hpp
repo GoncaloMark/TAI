@@ -22,31 +22,26 @@ namespace UTF8 {
         std::ifstream file;
 
     public:
-        explicit Utf8Reader(std::filesystem::path filePath) {
-            this->filePath = std::move(filePath);
-        };
+        explicit Utf8Reader() = default;
+        explicit Utf8Reader(std::filesystem::path filePath): filePath(std::move(filePath)) {};
 
         bool isOpen() {
             return file.is_open();
         };
 
-        std::string cannotOpenFileExceptionMessage() {
-            return "Failed to open file: " + filePath.string();
-        };
-
         void openFile() {
             if(isOpen()) {
-                throw std::runtime_error("File is already open: "+ filePath.string() + ".");
+                throw std::runtime_error("File is already open: " + filePath.string() + ".");
             }
             file.open(filePath, std::ios::binary);
             if(!isOpen()) {
-                throw std::ios_base::failure(cannotOpenFileExceptionMessage());
+                throw std::ios_base::failure("Failed to open file: " + filePath.string());
             }
         };
 
         Utf8Character getNextCharacter() {
             if(!isOpen()) {
-                throw std::ios_base::failure(cannotOpenFileExceptionMessage());
+                openFile();
             }
 
             std::vector<char> charBytes;
@@ -67,8 +62,7 @@ namespace UTF8 {
                 charBytes.push_back(byte);
             }
 
-            std::string utf8Character(charBytes.begin(), charBytes.end());
-            Utf8Character character(utf8Character, charPosition);
+            Utf8Character character(std::string(charBytes.begin(), charBytes.end()), charPosition);
             return character;
         };
 
@@ -97,8 +91,8 @@ namespace UTF8 {
         };
 
         bool isEndOfFile() {
-            if(!file.is_open()) {
-                throw std::ios_base::failure("File is not open: " + filePath.string());
+            if(!isOpen()) {
+                return false;
             }
             return file.eof();
         };
@@ -107,24 +101,30 @@ namespace UTF8 {
             file.close();
         };
 
-        Utf8Character getFirstChar() {
-            Utf8Character firstChar;
+        Utf8Character getCharAt(uint32_t position) {
+            Utf8Character character;
+            unsigned int curPosition;
+
             if(isOpen()) {
-                unsigned int curPosition = getCurPos();
-                file.seekg(0, std::ifstream::beg);
+                curPosition = getCurPos();
 
-                firstChar = getNextCharacter();
+                goToPos(position);
+                character = getNextCharacter();
 
-                file.seekg(curPosition, std::ifstream::beg);
+                goToPos(curPosition);
             } else {
                 openFile();
 
-                firstChar = getNextCharacter();
+                goToPos(position);
+                character = getNextCharacter();
 
                 closeFile();
             }
+            return character;
+        };
 
-            return firstChar;
+        Utf8Character getFirstChar() {
+            return getCharAt(0);
         };
 
         unsigned int getFileSize() {
@@ -147,10 +147,13 @@ namespace UTF8 {
             return fileSize;
         };
 
-        unsigned int getCurPos() {
+        uint32_t getCurPos() {
             return file.tellg();
         };
 
+        void goToPos(uint32_t position) {
+            file.seekg(position, std::ifstream::beg);
+        };
 
     };
 
