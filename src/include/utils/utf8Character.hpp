@@ -15,21 +15,17 @@ namespace UTF8 {
 
     private:
         std::string character;
-        unsigned int position{};
+        uint32_t position{};
     public:
 
         explicit Utf8Character() = default;
-
-        explicit Utf8Character(std::string character, unsigned int position) {
-            this->character = std::move(character);
-            this->position = position;
-        };
+        explicit Utf8Character(std::string character, uint32_t position): character(std::move(character)), position(position) {};
 
         [[nodiscard]] const std::string &getCharacter() const {
             return character;
         }
 
-        [[nodiscard]] unsigned int getPosition() const {
+        [[nodiscard]] uint32_t getPosition() const {
             return position;
         }
 
