@@ -22,8 +22,8 @@ namespace CPM {
                 kmerSize(k) {};
 
         void process() {
-            this->reader = UTF8::Utf8Reader(this->inputFilePath);
-            this->buffer = cbuffer::CircularBuffer<UTF8::Utf8Character>(this->kmerSize);
+            reader = UTF8::Utf8Reader(inputFilePath);
+            buffer = cbuffer::CircularBuffer<UTF8::Utf8Character>(kmerSize);
             finalHitProbability = 0.0;
             nHits = nFails = count = 0;
 
@@ -78,6 +78,17 @@ namespace CPM {
 
         UTF8::Utf8Reader reader;
 
+        void initialise() {
+            /// -> Get first Kmer
+            symbol = reader.getFirstChar();
+            for(int i=0;i<kmerSize;i++){
+                buffer.enqueue(symbol);
+            }
+            kmer = UTF8::Utf8Character::convertToStr(buffer.toList());
+            /// -> Set file position(optional)
+            reader.openFile();
+        };
+
         std::string predict() {
             std::vector<uint32_t> kmerPositions = positions[kmer];
             uint32_t chosenPos = kmerPositions.at(0);
@@ -91,25 +102,16 @@ namespace CPM {
             return ( ((nHits + alpha)/(nHits + nFails + 2*alpha)) * 100) < threshold;
         };
 
-        void updatePositions() {
-            positions[kmer].push_back(symbol.getPosition());
-        };
-
-        void initialise() {
-            /// -> Get first Kmer
-            symbol = reader.getFirstChar();
-            for(int i=0;i<kmerSize;i++){
-                buffer.enqueue(symbol);
-            }
-            kmer = UTF8::Utf8Character::convertToStr(buffer.toList());
-            /// -> Set file position(optional)
-            reader.openFile();
-        };
-
         void resetModel() {
             nHits = 0;
             nFails = 0;
         };
+
+        void updatePositions() {
+            positions[kmer].push_back(symbol.getPosition());
+        };
+
+
 
     };
 }
