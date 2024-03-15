@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <cstdint>
+#include <algorithm>
 #include "utils/parser.hpp"
 #include "utils/utf8Parser.hpp"
 

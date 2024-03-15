@@ -47,22 +47,19 @@ namespace UTF8 {
         file.seekg(0, std::ios::beg);
     }
 
-        bool Utf8Parser::readChunk(std::vector<std::vector<uint32_t>>& buffers, size_t bufferSize) {
+        bool Utf8Parser::readChunk(std::vector<uint32_t>& buffer, size_t bufferSize) {
             if (!file || !file.is_open()) {
                 std::cerr << "File is not open or accessible" << std::endl;
                 exit(-1);
             }
 
-            //TODO Clear buffers... in a correct manner
-            buffers[0].clear();
-            buffers[1].clear();
+            buffer.clear();
 
             // Seek to the last known position
             file.seekg(readPosition);
 
-            size_t totalBytesToRead = bufferSize * buffers.size();
-            std::vector<char> charBuffer(totalBytesToRead);
-            std::cout << "TOTAL BYTES: " << totalBytesToRead << std::endl;
+            std::vector<char> charBuffer(bufferSize * 1024);
+            std::cout << "TOTAL BYTES: " << bufferSize * 1024 << std::endl;
             std::cout << "Position: " << readPosition << std::endl;
             std::string leftover;
 
@@ -73,8 +70,8 @@ namespace UTF8 {
                 std::string chunk = leftover + std::string(charBuffer.data(), file.gcount());
                 leftover.clear();
 
-                size_t i = 0, bufferIndex = 0;
-                while (i < chunk.size() && bufferIndex < buffers.size()) {
+                size_t i = 0;
+                while (i < chunk.size()) {
                     size_t start = i;
                     size_t len = getCharLength(chunk[i]);
 
@@ -83,14 +80,9 @@ namespace UTF8 {
                         break;
                     }
 
-                    if (buffers[bufferIndex].size() * sizeof(uint32_t) >= bufferSize) {
-                        bufferIndex++;
-                        if (bufferIndex >= buffers.size()) break;
-                    }
-
                     std::string utf8Char = chunk.substr(start, len);
                     uint32_t hex = toHex(utf8Char);
-                    buffers[bufferIndex].push_back(hex);
+                    buffer.push_back(hex);
 
                     i += len;
                 }

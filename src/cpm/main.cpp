@@ -37,24 +37,28 @@ int main(int argc, char** argv){
     }
 
     UTF8::Utf8Parser decoder(inputFileName, 1024);
-    std::vector<uint32_t> buffer1;
-    std::vector<uint32_t> buffer2;
-
-    //TODO Maybe vector of references?
-    std::vector<std::vector<uint32_t>> buffers = {buffer1, buffer2};
+    std::vector<uint32_t> buffer;
     
 
-    decoder.readChunk(buffers, 1024);
+    decoder.readChunk(buffer, 1024);
 
-    std::cout << "BUFFER1: " << buffers[0][20] << "\nBUFFER2: " << buffers[1][20] << std::endl;
+    std::cout << "BUFFER1: " << buffer[0] << std::endl;
 
-    decoder.readChunk(buffers, 1024);
+    decoder.readChunk(buffer, 1024);
 
-    std::cout << "BUFFER1: " << buffers[0][20] << "\nBUFFER2: " << buffers[1][20] << std::endl;
+    std::cout << "BUFFER1: " << buffer[0] << std::endl;
 
-    decoder.readChunk(buffers, 1024);
+    decoder.readChunk(buffer, 1024);
 
-    std::cout << "BUFFER1: " << buffers[0][20] << "\nBUFFER2: " << buffers[1][20] << std::endl;
+    std::cout << "BUFFER1: " << buffer[0] <<  std::endl;
+
+    decoder.readChunk(buffer, 1024);
+
+    std::cout << "BUFFER1: " << buffer[0] <<  std::endl;
+
+    decoder.readChunk(buffer, 1024);
+
+    std::cout << "BUFFER1: " << buffer[0] <<  std::endl;
     // CPM::CopyModel2 copyModel(inputFileName, alpha, threshold, k);
     // copyModel.process();
 

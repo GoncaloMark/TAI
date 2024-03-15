@@ -38,7 +38,7 @@ namespace UTF8 {
             /// @param buffers Buffer vector containing the buffers.
             /// @param bufferSize Size to be read into buffer.
             /// @return Boolean, true in case of success, false in case of unsuccess.
-            bool readChunk(std::vector<std::vector<uint32_t>>& buffers, size_t bufferSize) override;
+            bool readChunk(std::vector<uint32_t>& buffer, size_t bufferSize) override;
 
             /// @brief Function to encode the hexadecimal back to UTF8
             /// @param character character to be encoded.
