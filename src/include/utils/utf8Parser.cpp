@@ -13,38 +13,90 @@ namespace UTF8 {
         return hex;
     }
 
-    void Utf8Parser::readAlphabet(std::filesystem::path filePath) {
-            std::ifstream file(filePath, std::ios::binary);
-            if (!file) {
-                std::cerr << "Failed to open file: " << filePath << std::endl;
-                return;
+    void Utf8Parser::readAll(std::function<void(uint32_t)> callback) {
+        if (!file || !file.is_open()) {
+            std::cerr << "File is not open or accessible" << std::endl;
+            exit(-1);
+        }
+
+        file.seekg(0, std::ios::beg);
+        std::vector<char> buffer(bufferSize * 1024);
+        std::string leftover;
+
+        while (file.read(buffer.data(), buffer.size()) || file.gcount() > 0) {
+            std::string chunk = leftover + std::string(buffer.data(), file.gcount());
+            leftover.clear();
+            size_t i = 0;
+
+            while (i < chunk.size()) {
+                size_t start = i;
+                size_t len = getCharLength(chunk[i]);
+                
+                if (i + len > chunk.size()) {
+                    leftover = chunk.substr(start);
+                    break;
+                }
+                std::string utf8Char = chunk.substr(start, len);
+                uint32_t hex = toHex(utf8Char);
+                callback(hex);
+                i += len;
+            }
+        }
+
+        file.clear();
+        file.seekg(0, std::ios::beg);
+    }
+
+        bool Utf8Parser::readChunk(std::vector<std::vector<uint32_t>>& buffers, size_t bufferSize) {
+            if (!file || !file.is_open()) {
+                std::cerr << "File is not open or accessible" << std::endl;
+                exit(-1);
             }
 
-            std::vector<char> buffer(bufferSize * 1024);
+            //TODO Clear buffers... in a correct manner
+            buffers[0].clear();
+            buffers[1].clear();
+
+            // Seek to the last known position
+            file.seekg(readPosition);
+
+            size_t totalBytesToRead = bufferSize * buffers.size();
+            std::vector<char> charBuffer(totalBytesToRead);
+            std::cout << "TOTAL BYTES: " << totalBytesToRead << std::endl;
+            std::cout << "Position: " << readPosition << std::endl;
             std::string leftover;
-            while (file.read(buffer.data(), buffer.size()) || file.gcount() > 0) {
-                std::string chunk = leftover + std::string(buffer.data(), file.gcount());
+
+            if (file.read(charBuffer.data(), charBuffer.size()) || file.gcount() > 0) {
+                // Update readPosition with the new position
+                readPosition = file.tellg();
+
+                std::string chunk = leftover + std::string(charBuffer.data(), file.gcount());
                 leftover.clear();
 
-                size_t i = 0;
-                while (i < chunk.size()) {
+                size_t i = 0, bufferIndex = 0;
+                while (i < chunk.size() && bufferIndex < buffers.size()) {
                     size_t start = i;
                     size_t len = getCharLength(chunk[i]);
-                    
+
                     if (i + len > chunk.size()) {
                         leftover = chunk.substr(start);
                         break;
                     }
 
+                    if (buffers[bufferIndex].size() * sizeof(uint32_t) >= bufferSize) {
+                        bufferIndex++;
+                        if (bufferIndex >= buffers.size()) break;
+                    }
+
                     std::string utf8Char = chunk.substr(start, len);
                     uint32_t hex = toHex(utf8Char);
-                    characters.insert(hex);
+                    buffers[bufferIndex].push_back(hex);
 
                     i += len;
                 }
+                return true;
             }
-
-            file.close();
+            return false;
         }
 
         std::string Utf8Parser::encode(uint32_t character){

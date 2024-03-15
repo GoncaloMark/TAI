@@ -4,39 +4,46 @@
 #include <fstream>
 #include <unordered_set>
 #include <string>
-#include <vector>
+#include <array>
 #include <cstdint>
 #include <filesystem>
+#include <functional>
 
 #include "parser.hpp"
 
-// TODO Use move semantics for passing around the strings.
 namespace UTF8 {
     class Utf8Parser : public Parser {
         public:
-            Utf8Parser(size_t bufferSize) : Parser(bufferSize) {};
+            /// @brief We open the file on the constructor.
+            explicit Utf8Parser(std::filesystem::path filePath, size_t bufferSize) : Parser(bufferSize), file(filePath, std::ios::binary) {
+                if (!file) {
+                    std::cerr << "Failed to open file: " << filePath << std::endl;
+                    throw std::runtime_error("Failed to open file");
+                }
+            };
 
-            /// @brief Reads and parses the file to get the alphabet (unique characters) into an unordered_set.
-            /// @param filePath Path to file in the system.
-            void readAlphabet(std::filesystem::path filePath) override;
-
-            /// @brief Prints the hexadecimal code points stored in the unordered_set.
-            void printAlphabet() override {
-                for (const auto& character : characters) {
-                    std::cout << "0x" << std::hex << character << std::endl;
+            /// @brief Destructor closes the file.
+            ~Utf8Parser() {
+                std::cout << "Destroying Parser..." << std::endl;
+                if (file.is_open()) {
+                    file.close();
                 }
             }
+
+            /// @brief Reads and parses the file applying user defined callback to the hex representation of a character.
+            /// @param callback user defined callback for handling the character processing.
+            void readAll(std::function<void(uint32_t)> callback) override;
+
+            /// @brief This function reads chunk into the specified buffers. 
+            /// @param buffers Buffer vector containing the buffers.
+            /// @param bufferSize Size to be read into buffer.
+            /// @return Boolean, true in case of success, false in case of unsuccess.
+            bool readChunk(std::vector<std::vector<uint32_t>>& buffers, size_t bufferSize) override;
 
             /// @brief Function to encode the hexadecimal back to UTF8
             /// @param character character to be encoded.
             /// @return std::string representing the encoded character.
             std::string encode(uint32_t character) override;
-
-            /// @brief Getter for the alphabet.
-            /// @return Alphabet unordered_set constant reference (read-only).
-            const std::unordered_set<uint32_t>& getAlphabet() const override {
-                return characters;
-            }
 
             /// @brief Private method to get the size in bytes of the character being read.
             /// @param character Character to be analysed.
@@ -54,5 +61,9 @@ namespace UTF8 {
             /// @param character UTF8 string format of the bytes.
             /// @return Unsigned integer with 32 bits representing the bytes in hexadecimal notation.
             uint32_t toHex(const std::string& character) override;
+
+        private:
+            std::ifstream file;
+            std::streampos readPosition;
     };
 }

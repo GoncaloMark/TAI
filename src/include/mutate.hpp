@@ -10,21 +10,27 @@
 namespace Mutate {
     class Mutator {
         public:
-            Mutator(std::filesystem::path inputFilePath, std::filesystem::path outputFilePath, double mutationProbability, Parser& decoder) : inputFilePath(inputFilePath), outputFilePath(outputFilePath), mutationProbability(mutationProbability), decoder(decoder){};
+            explicit Mutator(std::filesystem::path outputFilePath, const double mutationProbability, Parser& decoder) : outputFilePath(std::move(outputFilePath)), mutationProbability(mutationProbability), decoder(decoder){
+                std::cout << "Reading Alphabet..." << std::endl;
+                decoder.readAll([&](uint32_t character) {
+                    alphabet.insert(character);
+                });
+
+                alphabetVec = std::vector<uint32_t>(alphabet.begin(), alphabet.end());
+            };
 
             /// @brief Mutates the input file outputting to output file.
-            void MutateFile();
+            /// @param bufferSize bufsize from cmd line.
+            void mutateFile(const size_t bufferSize);
 
             /// @brief Prints the alphabet read by the decoder.
-            void PrintAlphabet();
-
-            /// @brief Method reads the alphabet from the file.
-            void ReadAlphabet();
+            void printAlphabet();
 
         private:
-            std::filesystem::path inputFilePath;
-            std::filesystem::path outputFilePath;
-            double mutationProbability;
+            const std::filesystem::path outputFilePath;
+            const double mutationProbability;
+            std::unordered_set<uint32_t> alphabet;
+            std::vector<uint32_t> alphabetVec;
             Parser& decoder;
 
             uint32_t mutateChar(uint32_t c);

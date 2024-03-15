@@ -10,23 +10,26 @@
 namespace CPM {
     class CopyModel {
     public:
-        CopyModel(std::filesystem::path inputFilePath, double alpha, double threshold, int k, Parser& decoder) : inputFilePath(inputFilePath), alpha(alpha), threshold(threshold), kmerSize(k), decoder(decoder){};
+        explicit CopyModel(std::filesystem::path inputFilePath, const double alpha, const double threshold, const int k, Parser& decoder) : inputFilePath(std::move(inputFilePath)), alpha(alpha), threshold(threshold), kmerSize(k), decoder(decoder){};
 
-        void startCompression();
+        void start();
 
         //TODO USE DOUBLE BUFFER IMPLEMENTATION.
     private:
         std::filesystem::path inputFilePath;
         std::unordered_map<std::string, uint32_t> positions;
 
+        std::vector<uint32_t> buffer1;
+        std::vector<uint32_t> buffer2;
+
         uint32_t Nh;
         uint32_t Nf;
 
-        double alpha;
-        double threshold;
+        const double alpha;
+        const double threshold;
 
         size_t totalBits;
-        int kmerSize;
+        const int kmerSize;
 
         //TODO Refactor decoder to get byte sequence of length K.
         Parser& decoder;

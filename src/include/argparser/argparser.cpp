@@ -4,13 +4,6 @@
 #include "../utils/utils.hpp"
 
 namespace ArgParser{
-    void ArgParser::ShowHelp() const {
-        std::cout << "Options:\n";
-            for (const auto& argType : argTypes) {
-                std::cout << argType.first << ' ' << argType.second << "\n";
-            }
-    }
-
     void ArgParser::ParseArgs() {
         try {
             for (int i = 0; i < argc; ++i) {

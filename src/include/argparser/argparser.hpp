@@ -26,10 +26,15 @@ namespace ArgParser {
     /// @private argv - array of arguments
     class ArgParser {
         public:
-            ArgParser(int argc, char** argv) : argc(argc), argv(argv){};
+            explicit ArgParser(int argc, char** argv) : argc(argc), argv(argv){};
 
             /// @brief Method to print out how to use this tool.
-            void ShowHelp() const;
+            void ShowHelp() const {
+                std::cout << "Options:\n";
+                    for (const auto& argType : argTypes) {
+                        std::cout << argType.first << ' ' << argType.second << "\n";
+                    }
+            }
 
             /// @brief Method that iteratively parses the argumenst.
             /// @return args_t - returns by value a struct containing the parsed arguments.
@@ -81,10 +86,10 @@ namespace ArgParser {
             /// @return String representation of the evaluated type.
             template<typename T>
             std::string getTypeName() {
-                if (std::is_same<T, int>::value) return "int";
-                if (std::is_same<T, double>::value) return "double";
-                if (std::is_same<T, std::filesystem::path>::value) return "path";
-                if (std::is_same<T, std::string>::value) return "string";
+                if constexpr (std::is_same<T, int>::value) return "int";
+                if constexpr (std::is_same<T, double>::value) return "double";
+                if constexpr (std::is_same<T, std::filesystem::path>::value) return "path";
+                if constexpr (std::is_same<T, std::string>::value) return "string";
                 return "unknown";
             }
     };

@@ -36,9 +36,27 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    UTF8::Utf8Parser decoder(1024);
-    CPM::CopyModel2 copyModel(inputFileName, alpha, threshold, k);
-    copyModel.process();
+    UTF8::Utf8Parser decoder(inputFileName, 1024);
+    std::vector<uint32_t> buffer1;
+    std::vector<uint32_t> buffer2;
+
+    //TODO Maybe vector of references?
+    std::vector<std::vector<uint32_t>> buffers = {buffer1, buffer2};
+    
+
+    decoder.readChunk(buffers, 1024);
+
+    std::cout << "BUFFER1: " << buffers[0][20] << "\nBUFFER2: " << buffers[1][20] << std::endl;
+
+    decoder.readChunk(buffers, 1024);
+
+    std::cout << "BUFFER1: " << buffers[0][20] << "\nBUFFER2: " << buffers[1][20] << std::endl;
+
+    decoder.readChunk(buffers, 1024);
+
+    std::cout << "BUFFER1: " << buffers[0][20] << "\nBUFFER2: " << buffers[1][20] << std::endl;
+    // CPM::CopyModel2 copyModel(inputFileName, alpha, threshold, k);
+    // copyModel.process();
 
 
     std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
