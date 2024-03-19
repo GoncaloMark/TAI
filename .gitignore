@@ -7,3 +7,4 @@ example/
 # Clion
 CMakeLists.txt
 cmake-build-debug/
+renan_cpm.sh
