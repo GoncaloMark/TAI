@@ -31,7 +31,7 @@ namespace UTF8 {
             while (i < chunk.size()) {
                 size_t start = i;
                 size_t len = getCharLength(chunk[i]);
-                
+
                 if (i + len > chunk.size()) {
                     leftover = chunk.substr(start);
                     break;
@@ -47,63 +47,63 @@ namespace UTF8 {
         file.seekg(0, std::ios::beg);
     }
 
-        bool Utf8Parser::readChunk(std::vector<uint32_t>& buffer, size_t bufferSize) {
-            if (!file || !file.is_open()) {
-                std::cerr << "File is not open or accessible" << std::endl;
-                return false;
-            }
-
-            buffer.clear();
-
-            // Seek to the last known position
-            file.seekg(readPosition);
-
-            std::vector<char> charBuffer(bufferSize * 1024);
-            std::cout << "TOTAL BYTES: " << bufferSize * 1024 << std::endl;
-            std::cout << "Position: " << readPosition << std::endl;
-
-            if (file.read(charBuffer.data(), charBuffer.size()) || file.gcount() > 0) {
-                // Update readPosition with the new position
-                readPosition = file.tellg();
-
-                std::string chunk = leftover + std::string(charBuffer.data(), file.gcount());
-                leftover.clear();
-
-                size_t i = 0;
-                while (i < chunk.size()) {
-                    size_t start = i;
-                    size_t len = getCharLength(chunk[i]);
-
-                    if (i + len > chunk.size()) {
-                        leftover = chunk.substr(start);
-                        break;
-                    }
-
-                    std::string utf8Char = chunk.substr(start, len);
-                    uint32_t hex = toHex(utf8Char);
-                    buffer.push_back(hex);
-
-                    i += len;
-                }
-                return true;
-            }
+    bool Utf8Parser::readChunk(std::vector<uint32_t>& buffer, size_t bufferSize) {
+        if (!file || !file.is_open()) {
+            std::cerr << "File is not open or accessible" << std::endl;
             return false;
         }
 
-        std::string Utf8Parser::encode(uint32_t character){
-            std::stringstream ss;
-            if (character & 0xFF000000) {  // Most significant byte (leftmost)
-                ss << static_cast<char>((character & 0xFF000000) >> 24);
+        buffer.clear();
+
+        // Seek to the last known position
+        file.seekg(readPosition);
+
+        std::vector<char> charBuffer(bufferSize * 1024);
+        std::cout << "TOTAL BYTES: " << bufferSize * 1024 << std::endl;
+        std::cout << "Position: " << readPosition << std::endl;
+
+        if (file.read(charBuffer.data(), charBuffer.size()) || file.gcount() > 0) {
+            // Update readPosition with the new position
+            readPosition = file.tellg();
+
+            std::string chunk = leftover + std::string(charBuffer.data(), file.gcount());
+            leftover.clear();
+
+            size_t i = 0;
+            while (i < chunk.size()) {
+                size_t start = i;
+                size_t len = getCharLength(chunk[i]);
+
+                if (i + len > chunk.size()) {
+                    leftover = chunk.substr(start);
+                    break;
+                }
+
+                std::string utf8Char = chunk.substr(start, len);
+                uint32_t hex = toHex(utf8Char);
+                buffer.push_back(hex);
+
+                i += len;
             }
-            if (character & 0x00FF0000) {
-                ss << static_cast<char>((character & 0x00FF0000) >> 16);
-            }
-            if (character & 0x0000FF00) {
-                ss << static_cast<char>((character & 0x0000FF00) >> 8);
-            }
-            if (character & 0x000000FF) {  // Least significant byte (rightmost)
-                ss << static_cast<char>(character & 0x000000FF);
-            }
-            return ss.str();
+            return true;
         }
+        return false;
+    }
+
+    std::string Utf8Parser::encode(uint32_t character){
+        std::stringstream ss;
+        if (character & 0xFF000000) {  // Most significant byte (leftmost)
+            ss << static_cast<char>((character & 0xFF000000) >> 24);
+        }
+        if (character & 0x00FF0000) {
+            ss << static_cast<char>((character & 0x00FF0000) >> 16);
+        }
+        if (character & 0x0000FF00) {
+            ss << static_cast<char>((character & 0x0000FF00) >> 8);
+        }
+        if (character & 0x000000FF) {  // Least significant byte (rightmost)
+            ss << static_cast<char>(character & 0x000000FF);
+        }
+        return ss.str();
+    }
 }
