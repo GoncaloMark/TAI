@@ -50,7 +50,7 @@ namespace UTF8 {
         bool Utf8Parser::readChunk(std::vector<uint32_t>& buffer, size_t bufferSize) {
             if (!file || !file.is_open()) {
                 std::cerr << "File is not open or accessible" << std::endl;
-                exit(-1);
+                return false;
             }
 
             buffer.clear();
@@ -61,7 +61,6 @@ namespace UTF8 {
             std::vector<char> charBuffer(bufferSize * 1024);
             std::cout << "TOTAL BYTES: " << bufferSize * 1024 << std::endl;
             std::cout << "Position: " << readPosition << std::endl;
-            std::string leftover;
 
             if (file.read(charBuffer.data(), charBuffer.size()) || file.gcount() > 0) {
                 // Update readPosition with the new position

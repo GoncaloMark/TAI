@@ -18,4 +18,5 @@ class Parser {
 
     protected:
         size_t bufferSize;
+        std::string leftover;
 };
