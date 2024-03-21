@@ -8,7 +8,7 @@ INCLUDE_C_OBJS := $(INCLUDE_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* CPM
 CPM_OUTPUT_FILE := ${OUTPUT_DIR}/cpm_model
-CPM_C_SRC := src/cpm/main.cpp 
+CPM_C_SRC := src/cpm/main.cpp src/cpm/cpm.cpp
 CPM_C_OBJS := $(CPM_C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* MUTATE

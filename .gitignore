@@ -1,8 +1,7 @@
 bin/
 .vscode/
-chry.txt
+*.txt
 .idea/
-mutated_chry.txt
 example/
 # Clion
 CMakeLists.txt

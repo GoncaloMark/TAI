@@ -38,15 +38,23 @@ namespace cbuffer {
             this->_size = 0;
         };
 
+        void clear() {
+            head = 0;
+            tail = 0;
+            _size = 0;
+
+            for (size_t i = 0; i < maxSize; ++i) {
+                buffer[i] = 0;
+            }
+        }
+
         // Add an item to this circular buffer.
         void enqueue(T item) {
-            if (isFull()) { // if buffer is full, throw an error
-                throw std::runtime_error("buffer is full");
+            if (isFull()) {
+                (void) this->dequeue();
             }
 
-            // insert item at back of buffer
             buffer[tail] = item;
-            // increment tail &  increase _size by 1
             tail = (tail + 1) % maxSize;
             _size++;
         };
@@ -61,7 +69,7 @@ namespace cbuffer {
             // get item at head
             T item = buffer[head];
             // set item at head to be empty
-            buffer[head] = empty_item;
+            buffer[head] = 0;
             // move head forward & decrease _size by 1
             head = (head + 1) % maxSize;
             _size--;

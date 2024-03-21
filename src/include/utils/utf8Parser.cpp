@@ -58,7 +58,7 @@ namespace UTF8 {
             // Seek to the last known position
             file.seekg(readPosition);
 
-            std::vector<char> charBuffer(bufferSize * 1024);
+            std::vector<char> charBuffer(bufferSize * 1024); //REMOVE * 1024 FOR TESTING BUFFERED
             std::cout << "TOTAL BYTES: " << bufferSize * 1024 << std::endl;
             std::cout << "Position: " << readPosition << std::endl;
 

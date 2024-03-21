@@ -5,7 +5,7 @@
 #include "../include/utils/Utf8Reader.hpp"
 #include "../include/utils/CircularBuffer.hpp"
 #include "../include/utils/utf8Character.hpp"
-#include "../include/cpm2.hpp"
+#include "../include/cpm.hpp"
 
 int main(int argc, char** argv){
     argc--;
@@ -14,19 +14,20 @@ int main(int argc, char** argv){
     ArgParser::ArgParser parser(argc, argv);
     
     parser.registerArgType<int>("--k");
+    parser.registerArgType<int>("--bufSize");
     parser.registerArgType<double>("--alpha");
     parser.registerArgType<double>("--threshold");
     parser.registerArgType<std::filesystem::path>("--inputFileName");
 
     parser.ParseArgs();
 
-    int k;
-    double alpha;
-    double threshold;
+    int k, bufSize;
+    double alpha, threshold;
     std::filesystem::path inputFileName;
 
     try{
         k = parser.GetArgValue<int>("--k");
+        bufSize = parser.GetArgValue<int>("--bufSize");
         alpha = parser.GetArgValue<double>("--alpha");
         threshold = parser.GetArgValue<double>("--threshold");
         inputFileName = parser.GetArgValue<std::filesystem::path>("--inputFileName");
@@ -36,32 +37,9 @@ int main(int argc, char** argv){
         return EXIT_FAILURE;
     }
 
-    UTF8::Utf8Parser decoder(inputFileName, 1024);
-    std::vector<uint32_t> buffer;
-    
-
-    decoder.readChunk(buffer, 1024);
-
-    std::cout << "BUFFER1: " << buffer[0] << std::endl;
-
-    decoder.readChunk(buffer, 1024);
-
-    std::cout << "BUFFER1: " << buffer[0] << std::endl;
-
-    decoder.readChunk(buffer, 1024);
-
-    std::cout << "BUFFER1: " << buffer[0] <<  std::endl;
-
-    decoder.readChunk(buffer, 1024);
-
-    std::cout << "BUFFER1: " << buffer[0] <<  std::endl;
-
-    decoder.readChunk(buffer, 1024);
-
-    std::cout << "BUFFER1: " << buffer[0] <<  std::endl;
-    // CPM::CopyModel2 copyModel(inputFileName, alpha, threshold, k);
-    // copyModel.process();
-
+    UTF8::Utf8Parser decoder(inputFileName, bufSize);
+    CPM::CopyModel copyModel(alpha, threshold, k, bufSize, decoder);
+    copyModel.start();
 
     std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
     return 0;
