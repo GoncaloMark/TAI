@@ -41,6 +41,6 @@ int main(int argc, char** argv){
     CPM::CopyModel copyModel(alpha, threshold, k, bufSize, decoder);
     copyModel.start();
 
-    std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
+    // std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
     return 0;
 }

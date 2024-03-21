@@ -5,4 +5,6 @@
 /// @param Nf       Number of Fails
 /// @param alpha    Alpha term
 /// @return         The calculted probability
-inline double calculateHitProbability(const unsigned int Nh, const unsigned int Nf, const double alpha);
+inline double calculateHitProbability(const unsigned int Nh, const unsigned int Nf, const double alpha){
+    return static_cast<double>((Nh + alpha) / (Nh + Nf + 2*alpha));
+};
