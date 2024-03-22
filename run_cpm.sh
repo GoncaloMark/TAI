@@ -1,1 +1,1 @@
-./bin/cpm_model --alpha 120 --k 4 --threshold 14 --inputFileName chry2.txt --bufSize 8
+./bin/cpm_model --alpha 1 --k 15 --threshold 14 --inputFileName chry.txt --bufSize 1024

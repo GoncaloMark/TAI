@@ -64,5 +64,7 @@ namespace CPM {
             // buffers[0].clear();
             // buffers[1].clear();
         };
+
+        void updateBufferIndices();
     };
 }

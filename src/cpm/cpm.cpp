@@ -24,29 +24,64 @@ namespace CPM {
             processBuffer(kmerBuf, buffers[0], kmerSize);
 
             buffers[1] = buffers[0];
+            updateBufferIndices();
             count++;
         }
         HitProbability = calculateHitProbability(Nh, Nf, alpha);
         std::cout << "End: " << HitProbability/count << std::endl;
     }
 
+    void CopyModel::updateBufferIndices() {
+        std::unordered_map<std::string, std::tuple<size_t, uint32_t>> updatedPositions;
+
+        for (auto& position : positions) {
+            const auto& kmer = position.first;
+            auto& [bufIndex, pos] = position.second;
+
+            // If k-mer in buffer2 (index 1), it needs to be deleted
+            if (bufIndex == 1) {
+                continue; // Skip and delete this k-mer
+            }
+
+            // If k-mer in buffer1 (index 0), update its index to 1
+            if (bufIndex == 0) {
+                // Check if the next position is within bounds
+                if (pos + kmerSize < buffers[1].size()) {
+                    updatedPositions[kmer] = std::make_tuple(1, pos);
+                }
+            }
+        }
+
+        // Replace the old map
+        positions = std::move(updatedPositions);
+    }
+
     //TODO Pos is end position of kmer not start of kmer
     void CopyModel::processKmer(std::string& kmer, size_t pos, size_t bufIndex){
-        //TODO gotta find a way to update every bufIndex in the map at the end of a buffer run, if anchors were at bufIndex 1 they get deleted, if anchors were at bufIndex 0 they get updated to 1.
-        if (positions.find(kmer) != positions.end()){
-            //TODO: This wont work at buffer transition
-            if(buffers[std::get<0>(positions[kmer])][std::get<1>(positions[kmer]) + kmerSize] == buffers[bufIndex][pos + kmerSize]) {
+        if (positions.find(kmer) != positions.end()) {
+            size_t prevBufIndex = std::get<0>(positions[kmer]);
+            uint32_t prevPos = std::get<1>(positions[kmer]);
+
+            bool match = false;
+            if (prevBufIndex == bufIndex && pos + kmerSize < buffers[bufIndex].size()) {
+                match = buffers[bufIndex][prevPos + kmerSize] == buffers[bufIndex][pos + kmerSize];
+            } else if (prevBufIndex != bufIndex && prevBufIndex < buffers.size() && prevPos + kmerSize < buffers[prevBufIndex].size() && pos + kmerSize < buffers[bufIndex].size()) {
+                match = buffers[prevBufIndex][prevPos + kmerSize] == buffers[bufIndex][pos + kmerSize];
+            }
+
+            if (match) {
                 Nh++;
             } else {
                 Nf++;
             }
 
+            // Update the position
             positions[kmer] = std::make_tuple(bufIndex, pos);
         } else {
             positions.insert({kmer, std::make_tuple(bufIndex, pos)});
         }
 
-        if(!precision()) {
+        if (!precision()) {
             resetModel();
         }
     }
@@ -59,7 +94,7 @@ namespace CPM {
                 kmerBuf.enqueue(buffer[index + i]);
             }
             std::string kmerString = convertKmerToString(kmerBuf);
-            std::cout << kmerString << std::endl;
+            // std::cout << kmerString << std::endl;
 
             processKmer(kmerString, index, 0);
         }
@@ -69,6 +104,7 @@ namespace CPM {
         if (buffer2.size() >= kmerSize - 1) {
             for (size_t i = buffer2.size() - kmerSize + 1; i < buffer2.size(); ++i) {
                 kmerBuf.clear();
+                size_t buffer1Index = 0; // Track the position in buffer1
 
                 // Start from the end of buffer2
                 for (size_t j = i; j < buffer2.size(); ++j) {
@@ -76,13 +112,17 @@ namespace CPM {
                 }
 
                 // Fill the rest from the start of buffer1
-                for (size_t j = 0; kmerBuf.size() < kmerSize && j < buffer1.size(); ++j) {
-                    kmerBuf.enqueue(buffer1[j]);
+                while (kmerBuf.size() < kmerSize && buffer1Index < buffer1.size()) {
+                    kmerBuf.enqueue(buffer1[buffer1Index]);
+                    buffer1Index++;
                 }
 
                 if (kmerBuf.size() == kmerSize) {
                     std::string kmerString = convertKmerToString(kmerBuf);
-                    std::cout << kmerString << std::endl;
+                    // std::cout << kmerString << std::endl;
+
+                    // Here, we're passing buffer1Index - 1 as the position where the k-mer ends in buffer1.
+                    processKmer(kmerString, buffer1Index - 1, 1);
                 }
             }
         }
