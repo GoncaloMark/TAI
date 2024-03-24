@@ -7,8 +7,10 @@
 #include <algorithm>
 #include <array>
 #include <tuple>
+#include <math.h>
 #include "utils/parser.hpp"
 #include "utils/utf8Parser.hpp"
+#include "../include/utils/utils.hpp"
 #include "../include/utils/CircularBuffer.hpp"
 
 namespace CPM {
@@ -17,6 +19,10 @@ namespace CPM {
         explicit CopyModel(const double alpha, const double threshold, const int k, const int bufSize, Parser& decoder) : alpha(alpha), threshold(threshold), kmerSize(k), bufSize(bufSize), decoder(decoder){};
 
         void start();
+
+        double getTotalBits() const {
+            return totalBits;
+        };
 
     private:
         std::unordered_map<std::string, std::tuple<size_t, uint32_t>> positions;
@@ -29,9 +35,8 @@ namespace CPM {
         const double alpha;
         const double threshold;
 
-        size_t totalBits;
+        double totalBits;
         const int kmerSize;
-
         const int bufSize;
 
         Parser& decoder;
@@ -42,12 +47,25 @@ namespace CPM {
             return ((Nh + alpha)/(Nh + Nf + 2*alpha)) * 100 < threshold;
         };
 
+        ///
+        /// \param kmerBuf
+        /// \param buffer1
+        /// \param buffer2
+        /// \param kmerSize
         void processBufferTransition(cbuffer::CircularBuffer<uint32_t>& kmerBuf, const std::vector<uint32_t>& buffer1, const std::vector<uint32_t>& buffer2, size_t kmerSize);
 
+        ///
+        /// \param kmerBuf
+        /// \param buffer
+        /// \param kmerSize
         void processBuffer(cbuffer::CircularBuffer<uint32_t>& kmerBuf, const std::vector<uint32_t>& buffer, size_t kmerSize);
+
 
         void processKmer(std::string& kmer, size_t pos, size_t bufIndex);
 
+        /// @brief converts a circular buffer of utf8 characters in hexadecimal encoding in a string
+        /// \param kmerBuf circular buffer
+        /// \return Kmer in string format
         std::string convertKmerToString(cbuffer::CircularBuffer<uint32_t>& kmerBuf) {
             std::string kmerString;
             auto kmerList = kmerBuf.toList();
@@ -57,6 +75,7 @@ namespace CPM {
             return kmerString;
         }
 
+        /// @brief Resets the model in case it is not precise
         void resetModel() {
             Nh = 0;
             Nf = 0;
@@ -65,6 +84,9 @@ namespace CPM {
             // buffers[1].clear();
         };
 
+        ///
         void updateBufferIndices();
+
+        static double getEntropyProbability(double probability);
     };
 }

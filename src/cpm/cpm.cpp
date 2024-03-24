@@ -1,13 +1,12 @@
 #include "../include/cpm.hpp"
-#include "../include/utils/utils.hpp"
+
 
 namespace CPM {
     void CopyModel::start(){
         bool flag;
+        totalBits = 0.0;
         Nh = Nf = 0;
-        size_t count = 0;
-        
-        double HitProbability = 0.0;
+
         cbuffer::CircularBuffer<uint32_t> kmerBuf(kmerSize);
 
         while (true) {
@@ -17,6 +16,7 @@ namespace CPM {
                 break;
             }
 
+            //if Buffer 1 is not empty
             if (!buffers[1].empty()) {
                 processBufferTransition(kmerBuf, buffers[0], buffers[1], kmerSize);
             }
@@ -25,10 +25,7 @@ namespace CPM {
 
             buffers[1] = buffers[0];
             updateBufferIndices();
-            count++;
         }
-        HitProbability = calculateHitProbability(Nh, Nf, alpha);
-        std::cout << "End: " << HitProbability/count << std::endl;
     }
 
     void CopyModel::updateBufferIndices() {
@@ -58,7 +55,7 @@ namespace CPM {
 
     //TODO Pos is end position of kmer not start of kmer
     void CopyModel::processKmer(std::string& kmer, size_t pos, size_t bufIndex){
-        if (positions.find(kmer) != positions.end()) {
+        if (positions.find(kmer) != positions.end()) { // if positions hashmap contains the kmer
             size_t prevBufIndex = std::get<0>(positions[kmer]);
             uint32_t prevPos = std::get<1>(positions[kmer]);
 
@@ -73,6 +70,19 @@ namespace CPM {
                 Nh++;
             } else {
                 Nf++;
+            }
+
+            // TODO create function to obtain source alphabet.
+            size_t alphabetSize = 4;
+
+            // update total bits
+            double hitProb = calculateHitProbability(Nh, Nf, alpha);
+            double compProb = 1-hitProb;
+            double failProb = compProb/static_cast<double>(alphabetSize - 1);
+            if(match) {
+                totalBits += getEntropyProbability(hitProb);
+            } else {
+                totalBits += getEntropyProbability(failProb);
             }
 
             // Update the position
@@ -101,7 +111,9 @@ namespace CPM {
     }
 
     void CopyModel::processBufferTransition(cbuffer::CircularBuffer<uint32_t>& kmerBuf, const std::vector<uint32_t>& buffer1, const std::vector<uint32_t>& buffer2, size_t kmerSize) {
+        // if size of buffer 2 is bigger or equal to k - 1
         if (buffer2.size() >= kmerSize - 1) {
+            // Iterate over the last k-1 positions of buffer 2
             for (size_t i = buffer2.size() - kmerSize + 1; i < buffer2.size(); ++i) {
                 kmerBuf.clear();
                 size_t buffer1Index = 0; // Track the position in buffer1
@@ -126,6 +138,10 @@ namespace CPM {
                 }
             }
         }
+    }
+
+    double CopyModel::getEntropyProbability(double probability) {
+        return -log2(probability);
     }
 }
 
