@@ -38,8 +38,10 @@ namespace Mutate{
             double rnd = static_cast<double>(rand()) / RAND_MAX;
             uint32_t current = character;
 
-            if (rnd < mutationProbability && alphabet.find(character) != alphabet.end()) {
-                current = mutateChar(character);
+            if(current != 0x9 && current != 0xA && current != 0xD && current != 0x20){
+                if (rnd < mutationProbability && alphabet.find(character) != alphabet.end()) {
+                    current = mutateChar(character);
+                }
             }
             
             outputBuffer.append(decoder.encode(current));

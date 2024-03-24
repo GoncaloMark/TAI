@@ -13,7 +13,9 @@ namespace Mutate {
             explicit Mutator(std::filesystem::path outputFilePath, const double mutationProbability, Parser& decoder) : outputFilePath(std::move(outputFilePath)), mutationProbability(mutationProbability), decoder(decoder){
                 std::cout << "Reading Alphabet..." << std::endl;
                 decoder.readAll([&](uint32_t character) {
-                    alphabet.insert(character);
+                    if (character != 0x9 && character != 0xA && character != 0xD && character != 0x20){
+                        alphabet.insert(character);
+                    }
                 });
 
                 alphabetVec = std::vector<uint32_t>(alphabet.begin(), alphabet.end());
