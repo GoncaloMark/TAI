@@ -77,9 +77,10 @@ namespace CPM {
 
         /// @brief Resets the model in case it is not precise
         void resetModel() {
+            std::cout << "Reset..." << std::endl;
             Nh = 0;
             Nf = 0;
-            positions.clear();
+            // positions.clear();
             // buffers[0].clear();
             // buffers[1].clear();
         };
