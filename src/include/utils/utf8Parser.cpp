@@ -59,8 +59,8 @@ namespace UTF8 {
         file.seekg(readPosition);
 
             std::vector<char> charBuffer(bufferSize * 1024); //REMOVE * 1024 FOR TESTING BUFFERED
-            std::cout << "TOTAL BYTES: " << bufferSize * 1024 << std::endl;
-            std::cout << "Position: " << readPosition << std::endl;
+            //std::cout << "TOTAL BYTES: " << bufferSize * 1024 << std::endl;
+            //std::cout << "Position: " << readPosition << std::endl;
 
         if (file.read(charBuffer.data(), charBuffer.size()) || file.gcount() > 0) {
             // Update readPosition with the new position
