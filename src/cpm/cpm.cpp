@@ -77,13 +77,15 @@ namespace CPM {
 
             // update total bits
             double hitProb = calculateHitProbability(Nh, Nf, alpha);
-            double compProb = 1-hitProb;
-            double failProb = compProb/static_cast<double>(alphabetSize - 1);
+            double failProb = (1-hitProb)/static_cast<double>(alphabetSize - 1);
+            double curNBits;
             if(match) {
-                totalBits += getEntropyProbability(hitProb);
+                curNBits = getEntropyProbability(hitProb);
             } else {
-                totalBits += getEntropyProbability(failProb);
+                curNBits = getEntropyProbability(failProb);
             }
+            totalBits += curNBits;
+            std::cout << "-- TotalBits: " << getTotalBits() << " curNBits: " << curNBits << std::endl;
 
             // Update the position
             positions[kmer] = std::make_tuple(bufIndex, pos);
