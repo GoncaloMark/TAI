@@ -12,6 +12,8 @@
 #include "utils/utf8Parser.hpp"
 #include "../include/utils/utils.hpp"
 #include "../include/utils/CircularBuffer.hpp"
+#include "utils/AlphabetBuilder.hpp"
+#include <set>
 
 namespace CPM {
     class CopyModel {
@@ -24,6 +26,8 @@ namespace CPM {
             return totalBits;
         };
 
+        static std::set<uint32_t> getAlphabet(Parser& parser);
+
     private:
         std::unordered_map<std::string, std::tuple<size_t, uint32_t>> positions;
 
@@ -31,6 +35,9 @@ namespace CPM {
 
         uint32_t Nh;
         uint32_t Nf;
+
+        std::set<uint32_t> alphabet;
+        size_t alphabetSize;
 
         const double alpha;
         const double threshold;

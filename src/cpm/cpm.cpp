@@ -3,6 +3,9 @@
 
 namespace CPM {
     void CopyModel::start(){
+        alphabet = getAlphabet(decoder);
+        alphabetSize = alphabet.size();
+
         bool flag;
         totalBits = 0.0;
         Nh = Nf = 0;
@@ -71,9 +74,6 @@ namespace CPM {
             } else {
                 Nf++;
             }
-
-            // TODO create function to obtain source alphabet.
-            size_t alphabetSize = 4;
 
             // update total bits
             double hitProb = calculateHitProbability(Nh, Nf, alpha);
@@ -145,5 +145,13 @@ namespace CPM {
     double CopyModel::getEntropyProbability(double probability) {
         return -log2(probability);
     }
+
+    std::set<uint32_t> CopyModel::getAlphabet(Parser &parser) {
+        FILEINFO::AlphabetBuilder alphabetBuilder;
+
+        parser.readAll([&alphabetBuilder](uint32_t symbol) {alphabetBuilder.getAlphabetCallback(symbol);});
+
+        return alphabetBuilder.getAlphabet();
+    };
 }
 
