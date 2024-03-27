@@ -6,6 +6,7 @@
 #include "../include/utils/CircularBuffer.hpp"
 #include "../include/utils/utf8Character.hpp"
 #include "../include/cpm.hpp"
+#include "../include/utils/SourceInfo.hpp"
 
 int main(int argc, char** argv){
     argc--;
@@ -38,7 +39,8 @@ int main(int argc, char** argv){
     }
 
     UTF8::Utf8Parser decoder(inputFileName, bufSize);
-    CPM::CopyModel copyModel(alpha, threshold, k, bufSize, decoder);
+    FILEINFO::SourceInfo sourceInfo = FILEINFO::SourceInfo::getInformation(decoder);
+    CPM::CopyModel copyModel(alpha, threshold, k, bufSize, decoder, sourceInfo);
     copyModel.start();
 
     std::cout << "TotalBits: " << copyModel.getTotalBits() << std::endl;

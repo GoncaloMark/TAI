@@ -25,7 +25,7 @@ namespace Mutate {
             /// @param bufferSize bufsize from cmd line.
             void mutateFile(const size_t bufferSize);
 
-            /// @brief Prints the alphabet read by the decoder.
+            /// @brief Prints the charSet read by the decoder.
             void printAlphabet();
 
         private:

@@ -111,7 +111,7 @@ namespace cbuffer {
             return _size == maxSize;
         };
 
-        // Return the size of this circular buffer.
+        // Return the getSourceSize of this circular buffer.
         size_t size() {
             return _size;
         };

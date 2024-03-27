@@ -45,9 +45,9 @@ namespace UTF8 {
             /// @return std::string representing the encoded character.
             std::string encode(uint32_t character) override;
 
-            /// @brief Private method to get the size in bytes of the character being read.
+            /// @brief Private method to get the getSourceSize in bytes of the character being read.
             /// @param character Character to be analysed.
-            /// @return Returns a size_t representing size in bytes of character.
+            /// @return Returns a size_t representing getSourceSize in bytes of character.
             size_t getCharLength(char character) override {
                 unsigned char byte = character;
                 if ((byte & 0x80) == 0) return 1; // 0xxxxxxx
