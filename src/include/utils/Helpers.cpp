@@ -2,6 +2,6 @@
 
 namespace UTILS {
     double Helpers::calculateEntropy(double frequency) {
-        return -log2(frequency);
+        return -frequency*log2(frequency);
     }
 } // UTILS

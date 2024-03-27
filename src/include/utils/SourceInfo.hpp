@@ -28,12 +28,13 @@ namespace FILEINFO {
                 sourceSize += pair.second;
             }
 
-            totalBits = 0.0;
+            entropy = 0.0;
             for(const auto& symbol: charSet) {
-                charFreq[symbol] = ((double) charCount[symbol])/((double) sourceSize);
-                charEntropy[symbol] = UTILS::Helpers::calculateEntropy(charFreq[symbol]);
-                totalBits += charEntropy[symbol];
+                charFreq[symbol] = static_cast<double>(charCount[symbol])/static_cast<double>(sourceSize);
+                entropy += UTILS::Helpers::calculateEntropy(charFreq[symbol]);
             }
+
+            totalBits = entropy*static_cast<double>(sourceSize);
         };
 
         std::set<uint32_t> alphabet() {
@@ -56,8 +57,8 @@ namespace FILEINFO {
             return charFreq;
         }
 
-        std::unordered_map<uint32_t, double> getEntropy() {
-            return charEntropy;
+        double getEntropy() const {
+            return entropy;
         }
 
         static FILEINFO::SourceInfo getInformation(Parser &parser) {
@@ -73,6 +74,7 @@ namespace FILEINFO {
         std::unordered_map<uint32_t, double> charEntropy;
         std::set<uint32_t> charSet;
         size_t sourceSize;
+        double entropy;
         double totalBits;
 
         class SourceInfoBuilder {

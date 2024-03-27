@@ -78,9 +78,9 @@ namespace CPM {
             double failProb = (1-hitProb)/static_cast<double>(sourceInfo.alphabet().size() - 1);
             double curNBits;
             if(match) {
-                curNBits = UTILS::Helpers::calculateEntropy(hitProb);
+                curNBits = -log2(hitProb);
             } else {
-                curNBits = UTILS::Helpers::calculateEntropy(failProb);
+                curNBits = -log2(failProb);
             }
             totalBits += curNBits;
 
