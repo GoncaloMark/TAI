@@ -15,6 +15,7 @@
 #include "../include/utils/utils.hpp"
 #include "../include/utils/CircularBuffer.hpp"
 #include "utils/SourceInfo.hpp"
+#include "../include/utils/Helpers.hpp"
 
 namespace CPM {
     class CopyModel {
@@ -95,7 +96,5 @@ namespace CPM {
 
         ///
         void updateBufferIndices();
-
-        static double getEntropyProbability(double probability);
     };
 }
