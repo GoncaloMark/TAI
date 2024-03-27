@@ -78,12 +78,11 @@ namespace CPM {
             double failProb = (1-hitProb)/static_cast<double>(sourceInfo.alphabet().size() - 1);
             double curNBits;
             if(match) {
-                curNBits = getEntropyProbability(hitProb);
+                curNBits = UTILS::Helpers::calculateEntropy(hitProb);
             } else {
-                curNBits = getEntropyProbability(failProb);
+                curNBits = UTILS::Helpers::calculateEntropy(failProb);
             }
             totalBits += curNBits;
-            std::cout << "-- TotalBits: " << getTotalBits() << " curNBits: " << curNBits << std::endl;
 
             // Update the position
             positions[kmer] = std::make_tuple(bufIndex, pos);
@@ -138,10 +137,6 @@ namespace CPM {
                 }
             }
         }
-    }
-
-    double CopyModel::getEntropyProbability(double probability) {
-        return -log2(probability);
     }
 }
 
