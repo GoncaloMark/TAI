@@ -1,32 +1,34 @@
 #pragma once
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <unordered_set>
 #include <unordered_map>
 #include <cstdint>
 #include <algorithm>
 #include <array>
 #include <tuple>
-#include <math.h>
+#include <cmath>
+#include <set>
+
 #include "utils/parser.hpp"
 #include "utils/utf8Parser.hpp"
 #include "../include/utils/utils.hpp"
 #include "../include/utils/CircularBuffer.hpp"
-#include "utils/AlphabetBuilder.hpp"
-#include <set>
+#include "utils/SourceInfo.hpp"
 
 namespace CPM {
     class CopyModel {
     public:
-        explicit CopyModel(const double alpha, const double threshold, const int k, const int bufSize, Parser& decoder) : alpha(alpha), threshold(threshold), kmerSize(k), bufSize(bufSize), decoder(decoder){};
+        explicit CopyModel(const double alpha, const double threshold, const int k, const int bufSize, Parser &decoder,
+                           FILEINFO::SourceInfo &sourceInfo)
+                : alpha(alpha), threshold(threshold), kmerSize(k), bufSize(bufSize), decoder(decoder),
+                  sourceInfo(sourceInfo) {};
 
         void start();
 
         double getTotalBits() const {
             return totalBits;
         };
-
-        static std::set<uint32_t> getAlphabet(Parser& parser);
 
     private:
         std::unordered_map<std::string, std::tuple<size_t, uint32_t>> positions;
@@ -36,8 +38,6 @@ namespace CPM {
         uint32_t Nh;
         uint32_t Nf;
 
-        std::set<uint32_t> alphabet;
-        size_t alphabetSize;
 
         const double alpha;
         const double threshold;
@@ -47,6 +47,7 @@ namespace CPM {
         const int bufSize;
 
         Parser& decoder;
+        FILEINFO::SourceInfo& sourceInfo;
 
         /// @brief This private method tests the precision of our copy model
         /// @return True if model is being precise, False if model is being imprecise over threshold.

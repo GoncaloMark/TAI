@@ -3,8 +3,6 @@
 
 namespace CPM {
     void CopyModel::start(){
-        alphabet = getAlphabet(decoder);
-        alphabetSize = alphabet.size();
 
         bool flag;
         totalBits = 0.0;
@@ -77,7 +75,7 @@ namespace CPM {
 
             // update total bits
             double hitProb = calculateHitProbability(Nh, Nf, alpha);
-            double failProb = (1-hitProb)/static_cast<double>(alphabetSize - 1);
+            double failProb = (1-hitProb)/static_cast<double>(sourceInfo.alphabet().size() - 1);
             double curNBits;
             if(match) {
                 curNBits = getEntropyProbability(hitProb);
@@ -113,7 +111,7 @@ namespace CPM {
     }
 
     void CopyModel::processBufferTransition(cbuffer::CircularBuffer<uint32_t>& kmerBuf, const std::vector<uint32_t>& buffer1, const std::vector<uint32_t>& buffer2, size_t kmerSize) {
-        // if size of buffer 2 is bigger or equal to k - 1
+        // if getSourceSize of buffer 2 is bigger or equal to k - 1
         if (buffer2.size() >= kmerSize - 1) {
             // Iterate over the last k-1 positions of buffer 2
             for (size_t i = buffer2.size() - kmerSize + 1; i < buffer2.size(); ++i) {
@@ -145,13 +143,5 @@ namespace CPM {
     double CopyModel::getEntropyProbability(double probability) {
         return -log2(probability);
     }
-
-    std::set<uint32_t> CopyModel::getAlphabet(Parser &parser) {
-        FILEINFO::AlphabetBuilder alphabetBuilder;
-
-        parser.readAll([&alphabetBuilder](uint32_t symbol) {alphabetBuilder.getAlphabetCallback(symbol);});
-
-        return alphabetBuilder.getAlphabet();
-    };
 }
 
