@@ -1,0 +1,1 @@
+./bin/cpm_model --alpha 1 --k 5 --threshold 10 --inputFileName ./example/chry.txt --bufSize 1024

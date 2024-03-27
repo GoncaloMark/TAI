@@ -1,1 +1,0 @@
-./bin/cpm_model ./Debug/tai --alpha 120 --k 50 --threshold 14 --inputFileName chry.txt
