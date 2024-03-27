@@ -43,6 +43,7 @@ int main(int argc, char** argv){
     CPM::CopyModel copyModel(alpha, threshold, k, bufSize, decoder, sourceInfo);
     copyModel.start();
 
+    std::cout << "entropy: " << sourceInfo.getTotalBits() << std::endl;
     std::cout << "TotalBits: " << copyModel.getTotalBits() << std::endl;
 
     // std::cout << "K: " << k << "\nThreshHold: " << threshold << "\nAlpha: " << alpha << "\nInput: " << inputFileName.string() << std::endl;
