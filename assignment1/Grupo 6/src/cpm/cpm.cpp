@@ -61,6 +61,7 @@ namespace CPM {
             uint32_t prevPos = std::get<1>(positions[kmer]);
 
             bool match = false;
+            //TODO: Check if this is correctly matching or always giving match (next to probability 1)
             if (prevBufIndex == bufIndex && pos + kmerSize < buffers[bufIndex].size()) {
                 match = buffers[bufIndex][prevPos + kmerSize] == buffers[bufIndex][pos + kmerSize];
             } else if (prevBufIndex != bufIndex && prevBufIndex < buffers.size() && prevPos + kmerSize < buffers[prevBufIndex].size() && pos + kmerSize < buffers[bufIndex].size()) {
