@@ -8,7 +8,7 @@ INCLUDE_C_OBJS := $(INCLUDE_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* CPM
 WAS_CHATTED_OUTPUT_FILE := ${OUTPUT_DIR}/was_chatted
-WAS_CHATTED_C_SRC := src/main.cpp
+WAS_CHATTED_C_SRC := src/main.cpp src/fcm.cpp
 WAS_CHATTED_C_OBJS := $(WAS_CHATTED_C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* COMPILER STUFF
