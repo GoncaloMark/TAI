@@ -6,3 +6,4 @@ example/
 CMakeLists.txt
 cmake-build-debug/
 *.txt
+assignment2/renan_run.sh
