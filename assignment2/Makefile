@@ -1,5 +1,6 @@
 OUTPUT_DIR := bin
 INCLUDE_DIR := src/include/
+EIGEN_DIR := src/include/Eigen/
 
 
 #* INCLUDE OBJS
@@ -13,7 +14,7 @@ WAS_CHATTED_C_OBJS := $(WAS_CHATTED_C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* COMPILER STUFF
 CCOMPILER := g++
-CFLAGS := -c -O3 -Wall -Werror -I"./src/include" 
+CFLAGS := -c -O3 -Wall -Werror -I$(INCLUDE_DIR) -I$(EIGEN_DIR)
 
 #* TARGETS
 all: clean was_chatted 
