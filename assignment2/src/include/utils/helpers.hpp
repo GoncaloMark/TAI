@@ -7,6 +7,7 @@
 #include <iostream>
 #include <filesystem>
 #include <unordered_set>
+#include "csv.hpp"
 
 namespace UTILS {
 
@@ -40,4 +41,60 @@ namespace UTILS {
         file.close();
         return size;
     }
+
+    bool fileExists(const std::filesystem::path& path) {
+        std::ifstream file(path);
+        return file.good();
+    }
+
+    void printCSV(const std::vector<std::vector<std::string>>& data) {
+        for (const auto& row : data) {
+            for (const auto& cell : row) {
+                std::cout << cell << ",";
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    /* Specific functions to our problems */
+
+    std::vector<std::vector<std::string>> readCSV(const std::filesystem::path& filename) {
+        csv::CSVReader reader(filename.string());
+        std::vector<std::vector<std::string>> data;
+
+        for (auto& row: reader) {
+            std::vector<std::string> rowData;
+            std::string text = row[0].get<std::string>();
+            std::string label = row[1].get<std::string>();
+            if(label != "0" && label != "1") {
+                std::cout << "Error here! " << label << std::endl;
+            }
+            rowData.push_back(text);
+            rowData.push_back(label);
+            data.push_back(rowData);
+        }
+
+        return data;
+    }
+
+    std::vector<std::string> getInput(const std::vector<std::vector<std::string>>& data) {
+        std::vector<std::string> input;
+        for (const auto& row : data) {
+            // Assuming the input is in the first column
+            input.push_back(row[0]);
+        }
+        return input;
+    }
+
+    std::vector<int> getOutput(const std::vector<std::vector<std::string>>& data) {
+        std::vector<int> output;
+        int value;
+        for (const auto& row : data) {
+            value = stoi(row[1]);
+            output.push_back(value);
+        }
+        return output;
+    }
+
+
 }
