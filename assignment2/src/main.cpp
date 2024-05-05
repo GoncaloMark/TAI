@@ -2,8 +2,10 @@
 #include <fstream>
 #include "include/fcm.hpp"
 #include "include/argparser/argparser.hpp"
+#include "include/utils/Fcm2.hpp"
+#include "include/utils/helpers.hpp"
 
-int main(int argc, char **argv){
+int main(int argc, char **argv) {
     argc--;
     argv++;
 
@@ -34,16 +36,35 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-    std::string testText = "This isn't a test.";
+    const auto& alphabet = UTILS::generateAsciiAlphabet();
 
-    FCM::Model humanModel(alpha, kSize, inputFileName, asciiChars);
-    humanModel.process();
+    std::string testText = "This isn't a test. i dont know what to do";
+    std::filesystem::path dataCSV = "dataset/data.csv";
 
-    humanModel.evaluateTestText(testText);
+    auto data = UTILS::readCSV(dataCSV);
 
-    // FCM::Model gptModel(alpha, kSize, inputFileName, asciiChars);
-    // gptModel.process();
+    auto rhData = UTILS::filter(data, "0");
+    auto rcData = UTILS::filter(data, "1");
 
+    FCM::Fcm2 rhModel(kSize, alpha, alphabet);
+
+    auto rhTexts = UTILS::getInput(rhData);
+    for(auto& text: rhTexts) {
+        rhModel.update(text);
+    }
+    rhModel.process();
+    rhModel.evaluateTestText(testText);
+    std::cout << "chegou aqui 1" << std::endl;
+
+    FCM::Fcm2 rcModel(kSize, alpha, alphabet);
+
+    auto rcTexts = UTILS::getInput(rcData);
+    for(auto& text: rcTexts) {
+        rhModel.update(text);
+    }
+    rcModel.process();
+    rcModel.evaluateTestText(testText);
+    std::cout << "chegou aqui 2" << std::endl;
 
     return EXIT_SUCCESS;
 }

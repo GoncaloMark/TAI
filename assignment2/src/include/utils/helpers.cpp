@@ -12,6 +12,15 @@ namespace UTILS {
         return alphabet;
     }
 
+    size_t hashContext(const std::string& context) {
+
+        size_t hash = 0;
+        for (char c : context) {
+            hash = (hash * PRIME_NUMBER) + static_cast<size_t>(c);
+        }
+        return hash;
+    }
+
     std::string escapeString(const std::string& str) {
         std::string escapedStr;
         for (char c : str) {
