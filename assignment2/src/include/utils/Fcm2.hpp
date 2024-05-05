@@ -10,6 +10,8 @@
 #include <unordered_set>
 #include <cmath>
 #include "Sparse"
+#include "Dense"
+
 
 namespace FCM {
 
@@ -20,8 +22,41 @@ namespace FCM {
 
     public:
 
-        explicit Fcm2(size_t kSize, double alpha, const std::unordered_set<char>& alphabet): kSize(kSize), alpha(alpha),
-        alphabet(alphabet) {};
+        explicit Fcm2(size_t kSize, double alpha, const std::unordered_set<char>& alphabet):
+        kSize(kSize), alpha(alpha), alphabet(alphabet) {};
+
+        void update(const std::string& text) {
+            std::string context;
+            char nextSymbol;
+
+            for (size_t i = 0; i < text.size() - kSize; ++i) {
+                // Get the context and the next symbol
+                context = text.substr(i, kSize);
+                nextSymbol = text[i + kSize];
+                fcmCount[context][nextSymbol]++;
+            }
+        }
+
+        void process() {
+            const double constantTerm = static_cast<unsigned int>(alphabet.size()) * alpha;
+            double denominator;
+
+            for (auto& contextFreqDistPair : fcmCount) {
+                const auto& context = contextFreqDistPair.first;
+                auto& counters = contextFreqDistPair.second;
+
+                // get denominator
+                denominator = constantTerm;
+                for(const auto& counter: counters) {
+                    denominator += counter.second;
+                }
+
+                for(auto& symbol: alphabet) {
+                    fcmFreq[context][symbol] = (counters[symbol] + alpha)/denominator;
+                }
+            }
+            std::cout << "size contexts: " << fcmCount.size() << std::endl;
+        }
 
         // Function to build FCM fcmCount
         void getFCMCount(const std::filesystem::path& filePath) {
@@ -51,26 +86,7 @@ namespace FCM {
 
         }
 
-        void calculateRelativeFreq() {
 
-            const double constantTerm = static_cast<unsigned int>(alphabet.size()) * alpha;
-            double denominator;
-
-            for (auto& contextFreqDistPair : fcmCount) {
-                const auto& context = contextFreqDistPair.first;
-                auto& counters = contextFreqDistPair.second;
-
-                // get denominator
-                denominator = constantTerm;
-                for(const auto& counter: counters) {
-                    denominator += counter.second;
-                }
-
-                for(auto& symbol: alphabet) {
-                    fcmFreq[context][symbol] = (counters[symbol] + alpha)/denominator;
-                }
-            }
-        }
 
         double calculateEntropy(std::string &text) {
             double totalEntropy = 0.0;
@@ -99,31 +115,20 @@ namespace FCM {
         }
 
         void evaluateTestText(std::string& text) {
+            auto alphabetSize = static_cast<unsigned int>(alphabet.size());
+            double maxEntropy = log2(alphabetSize);
             double testEntropy = calculateEntropy(text);
-            double maxEntropy = log2(alphabet.size());
             double nrc = (maxEntropy - testEntropy) / maxEntropy;
 
             std::cout << "Test Text Entropy: " << testEntropy << std::endl;
             std::cout << "Normalized Relative Compression (NRC): " << nrc << std::endl;
         }
 
-        void printFCMCount() {
-            // Print the FCM fcmCount
-            for (const auto& contextFreqDistPair : fcmCount) {
-                const std::string& context = contextFreqDistPair.first;
+        void printFCMCount();
 
-                std::cout << "Context: " << context << std::endl;
-                for (const auto& symbolCountPair : contextFreqDistPair.second) {
-                    char symbol = symbolCountPair.first;
-                    auto count = symbolCountPair.second;
-                    std::cout << "  Symbol: " << symbol << ", Count: " << count << std::endl;
-                }
-            }
-        }
-
-        void printFCMFreq() {
+        static void printFCMFreq(const FCMFreq& fcmProb) {
             // Print the FCM fcmFreq
-            for (const auto& contextFreqDistPair : fcmFreq) {
+            for (const auto& contextFreqDistPair : fcmProb) {
                 const auto& context = contextFreqDistPair.first;
 
                 std::cout << "Context: " << context << std::endl;
@@ -135,50 +140,59 @@ namespace FCM {
             }
         }
 
-
-
-        void fcmModelToFeatureMatrix() {
+        Eigen::SparseMatrix<double> getFeatureMatrix(FCMCount& fcmCounter) {
+            int nContexts, nSymbols, row, col;
             // Get the number of contexts and symbols
-            int numContexts = static_cast<int>(fcmCount.size());
-            int numSymbols = static_cast<int>(alphabet.size());
+            nContexts = static_cast<int>(fcmCounter.size());
+            nSymbols = static_cast<int>(alphabet.size());
 
-            // Iterate over each text in the FCM model
-            for (const auto& contextFreqDistPair : fcmCount) {
+            // Create a SparseMatrix for the feature matrix
+            Eigen::SparseMatrix<double> featureMatrix(nContexts, nSymbols + 1); // +1 for context identifier column
+
+            // Iterate over each context in the FCM model
+            row = 0;
+            for (const auto& contextFreqDistPair : fcmCounter) {
                 const auto& context = contextFreqDistPair.first;
                 const auto& freqDist = contextFreqDistPair.second;
 
-                // Create a SparseMatrix for the current text
-                Eigen::SparseMatrix<double> featureMatrix(numContexts, numSymbols);
+                // Store the context identifier in the first column
+                featureMatrix.insert(row, 0) = static_cast<double>(hashContext(context));
 
-                // Populate the feature matrix
-                for (const auto& symbolCountPair : freqDist) {
-                    const auto& symbol = symbolCountPair.first;
-                    int row = stoi(context); // Convert context string to integer
-                    int col = static_cast<unsigned char>(symbol); // Convert symbol to ASCII value
-                    featureMatrix.insert(row, col) = static_cast<double>(symbolCountPair.second);
+                for(const auto symbol: alphabet) { // Iterate over symbol in alphabet
+                    auto symbolCountPair = freqDist.find(symbol);
+                    col = static_cast<int>(static_cast<unsigned char>(symbol)) + 1;
+                    double value = 0;
+                    if(symbolCountPair != freqDist.end()) {
+                        value = symbolCountPair->second;
+                    }
+                    featureMatrix.insert(row, col) = value;
                 }
-
-                // Add the feature matrix to the list of feature matrices
-                featureMatrices.push_back(featureMatrix);
+                row++; // Move to the next row
             }
+
+            featureMatrix.makeCompressed(); // Compress the sparse matrix
+            return featureMatrix;
         }
 
-        void printFeatureMatrix(int index) {
-            std::cout << "Feature Matrix for Text " << index << ":" << std::endl;
-            std::cout << featureMatrices[index] << std::endl;
+        static size_t hashContext(const std::string& context) {
+
+            size_t hash = 0;
+            for (char c : context) {
+                hash = (hash * PRIME_NUMBER) + static_cast<size_t>(c);
+            }
+            return hash;
         }
 
     private:
+        const static size_t PRIME_NUMBER = 31;
+
         size_t kSize;
         double alpha;
         const std::unordered_set<char>& alphabet;
 
         FCMCount fcmCount;
         FCMFreq fcmFreq;
-        std::vector<Eigen::SparseMatrix<double>> featureMatrices;
-
-        Eigen::SparseMatrix<double> featureMatrixTmp;
-
+        Eigen::SparseMatrix<double> featureMatrix;
     };
 
 } // FCM
