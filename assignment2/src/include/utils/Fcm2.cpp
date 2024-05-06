@@ -164,22 +164,14 @@ namespace FCM {
         std::cout << "Texts update - Execution time: " << duration.count()/1000000.0 << "s" << std::endl;
         ContextCounter contCounter = generateContextCounter(fcmCount);
 
-        //start = std::chrono::high_resolution_clock::now();
-
         FCMFreq fcmFreq = generateFCMFreq(fcmCount, alpha, alphabet, contCounter);
-
-        //duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-        //size_t model1Size = contCounterMemUsage(contCounter, k) + fcmFreqMemUsage(fcmFreq, k);
-        //std::cout << "fcmFreq1 generation - Execution time: " << duration.count()/1000000.0 << "s" << std::endl;
-        //start = std::chrono::high_resolution_clock::now();
-        //FCMFreq fcmFreq2 = generateFinalFCMFreq(fcmCount, alpha, alphabet, contCounter);
-        //duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-        //size_t model2Size = fcmFreqMemUsage(fcmFreq2, k);
-        //std::cout << "fcmFreq2 generation - Execution time: " << duration.count()/1000000.0 << "s" << std::endl;
-        //std::cout << "Model size 1: " << model1Size << std::endl;
-        //std::cout << "Model size 2: " << model2Size << std::endl;
-        //double ratio = (static_cast<double>(model1Size) / static_cast<double>(model2Size) );
-        //std::cout << "ratio: " << ratio * 100.0 << std::endl;
+        size_t model1Size = contCounterMemUsage(contCounter, k) + fcmFreqMemUsage(fcmFreq, k);
+        FCMFreq fcmFreq2 = generateFinalFCMFreq(fcmCount, alpha, alphabet, contCounter);
+        size_t model2Size = fcmFreqMemUsage(fcmFreq2, k);
+        std::cout << "Model size 1: " << model1Size << std::endl;
+        std::cout << "Model size 2: " << model2Size << std::endl;
+        double ratio = (static_cast<double>(model1Size) / static_cast<double>(model2Size) );
+        std::cout << "ratio: " << ratio * 100.0 << std::endl;
 
         FCMModel model(k, alpha, alphabet, contCounter, fcmFreq);
         return model;
