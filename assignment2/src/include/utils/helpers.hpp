@@ -20,7 +20,9 @@ namespace UTILS {
     bool fileExists(const std::filesystem::path& path);
     size_t hashContext(const std::string& context);
 
-    void printCSV(const std::vector<std::vector<std::string>>& data) ;
+    void printCSV(const std::vector<std::vector<std::string>>& data);
+
+    size_t strMemUsage(const std::string& str);
 
     /* Specific functions to our problems */
 
