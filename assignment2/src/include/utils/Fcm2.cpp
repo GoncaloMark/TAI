@@ -158,6 +158,9 @@ namespace FCM {
         auto start = std::chrono::high_resolution_clock::now();
         FCMCount fcmCount;
         for(auto& text: texts) {
+            if(text.size() <= k) {
+                continue;
+            }
             updateFCMCount(text, k, fcmCount);
         }
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
