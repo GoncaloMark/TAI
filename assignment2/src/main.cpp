@@ -9,12 +9,9 @@ int main(int argc, char **argv) {
     argc--;
     argv++;
 
-    std::string asciiChars;
-    for (int i = 0; i < 128; ++i) {
-        asciiChars += static_cast<char>(i);
-    }
-
     std::filesystem::path inputFileName;
+    std::filesystem::path rhDataPath;
+    std::filesystem::path rcDataPath;
     int kSize;
     double alpha;
 
@@ -22,12 +19,16 @@ int main(int argc, char **argv) {
 
     parser.registerArgType<int>("--kSize");
     parser.registerArgType<double>("--alpha");
+    parser.registerArgType<std::filesystem::path>("--rhModelPath");
+    parser.registerArgType<std::filesystem::path>("--rcModelPath");
     parser.registerArgType<std::filesystem::path>("--fileName");
 
     parser.ParseArgs();
 
     try{
         inputFileName = parser.GetArgValue<std::filesystem::path>("--fileName");
+        rhDataPath = parser.GetArgValue<std::filesystem::path>("--rhModelPath");
+        rcDataPath = parser.GetArgValue<std::filesystem::path>("--rcModelPath");
         kSize = parser.GetArgValue<int>("--kSize");
         alpha = parser.GetArgValue<double>("--alpha");
     } catch(const std::runtime_error& e){
@@ -39,7 +40,6 @@ int main(int argc, char **argv) {
     const auto& alphabet = UTILS::generateAsciiAlphabet();
 
     std::string testText = "This isn't a test. i dont know what to do";
-    std::filesystem::path dataCSV = "dataset/data.csv";
 
     auto data = UTILS::readCSV(dataCSV);
 

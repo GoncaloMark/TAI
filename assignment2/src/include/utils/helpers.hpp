@@ -24,6 +24,8 @@ namespace UTILS {
 
     /* Specific functions to our problems */
 
+    std::vector<std::string> readTextsFile(const std::filesystem::path& filePath);
+
     std::vector<std::vector<std::string>> readCSV(const std::filesystem::path& filename);
     std::vector<std::vector<std::string>> filter(const std::vector<std::vector<std::string>>& data, const std::string& label);
     std::vector<std::string> getInput(const std::vector<std::vector<std::string>>& data);
