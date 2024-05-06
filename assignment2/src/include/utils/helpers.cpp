@@ -138,9 +138,10 @@ namespace UTILS {
     std::vector<std::string> readTextsFile(const std::filesystem::path &filePath) {
         csv::CSVReader reader(filePath.string());
         std::vector<std::string> data;
+        std::string text;
 
         for (auto& row: reader) {
-            std::string text = row[0].get<std::string>();
+            text = row[0].get<std::string>();
             data.push_back(text);
         }
 
