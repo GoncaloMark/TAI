@@ -41,30 +41,13 @@ int main(int argc, char **argv) {
 
     std::string testText = "This isn't a test. i dont know what to do";
 
-    auto data = UTILS::readCSV(dataCSV);
+    auto rhTexts = UTILS::readTextsFile(rhDataPath);
+    FCM::FCMModel rhModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rhTexts);
+    auto rcTexts = UTILS::readTextsFile(rcDataPath);
+    FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcTexts);
 
-    auto rhData = UTILS::filter(data, "0");
-    auto rcData = UTILS::filter(data, "1");
-
-    FCM::Fcm2 rhModel(kSize, alpha, alphabet);
-
-    auto rhTexts = UTILS::getInput(rhData);
-    for(auto& text: rhTexts) {
-        rhModel.update(text);
-    }
-    rhModel.process();
     rhModel.evaluateTestText(testText);
-    std::cout << "chegou aqui 1" << std::endl;
-
-    FCM::Fcm2 rcModel(kSize, alpha, alphabet);
-
-    auto rcTexts = UTILS::getInput(rcData);
-    for(auto& text: rcTexts) {
-        rhModel.update(text);
-    }
-    rcModel.process();
     rcModel.evaluateTestText(testText);
-    std::cout << "chegou aqui 2" << std::endl;
 
     return EXIT_SUCCESS;
 }
