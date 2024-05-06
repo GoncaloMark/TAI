@@ -79,6 +79,11 @@ namespace UTILS {
         }
     }
 
+    size_t strMemUsage(const std::string& str) {
+        // Calculate the memory usage of the string
+        return str.size() * sizeof(char);
+    }
+
     /* Specific functions to our problems */
 
     std::vector<std::vector<std::string>> readCSV(const std::filesystem::path& filename) {
@@ -91,6 +96,7 @@ namespace UTILS {
             std::string label = row[1].get<std::string>();
             if(label != "0" && label != "1") {
                 std::cout << "Error here! " << label << std::endl;
+                exit(EXIT_FAILURE);
             }
             rowData.push_back(text);
             rowData.push_back(label);
@@ -127,5 +133,17 @@ namespace UTILS {
             output.push_back(value);
         }
         return output;
+    }
+
+    std::vector<std::string> readTextsFile(const std::filesystem::path &filePath) {
+        csv::CSVReader reader(filePath.string());
+        std::vector<std::string> data;
+
+        for (auto& row: reader) {
+            std::string text = row[0].get<std::string>();
+            data.push_back(text);
+        }
+
+        return data;
     }
 }
