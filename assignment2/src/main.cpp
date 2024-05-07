@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
     argc--;
     argv++;
 
-    std::filesystem::path inputFileName;
+    std::filesystem::path testTextPath;
     std::filesystem::path rhDataPath;
     std::filesystem::path rcDataPath;
     int kSize;
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
     parser.ParseArgs();
     try{
-        inputFileName = parser.GetArgValue<std::filesystem::path>("--textFile");
+        testTextPath = parser.GetArgValue<std::filesystem::path>("--textFile");
         rhDataPath = parser.GetArgValue<std::filesystem::path>("--rhModelPath");
         rcDataPath = parser.GetArgValue<std::filesystem::path>("--rcModelPath");
         kSize = parser.GetArgValue<int>("--kSize");
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 
     const auto& alphabet = UTILS::generateAsciiAlphabet();
 
-    std::string testText = UTILS::readText(inputFileName);
+    std::string testText = UTILS::readText(testTextPath);
 
     auto rhTexts = UTILS::readTextsFile(rhDataPath);
     FCM::FCMModel rhModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rhTexts);
