@@ -36,16 +36,30 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
+    // Program Execution
+
     const auto& alphabet = UTILS::generateAsciiAlphabet();
+
     std::string testText = UTILS::readText(inputFileName);
 
     auto rhTexts = UTILS::readTextsFile(rhDataPath);
     FCM::FCMModel rhModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rhTexts);
+
     auto rcTexts = UTILS::readTextsFile(rcDataPath);
     FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcTexts);
 
+    std::cout << "Rh Model: " << std::endl;
     rhModel.evaluateText(testText);
+    std::cout << std::endl;
+    std::cout << "Rc Model: " << std::endl;
     rcModel.evaluateText(testText);
+
+    if(FCM::FCMModel::wasRewrittenChatGpt(testText, rhModel, rcModel)) {
+        std::cout << "The text is likely rewritten by ChatGpt" << std::endl;
+    } else {
+        std::cout << "The text is likely rewritten by a Human User" << std::endl;
+    }
+
 
     return EXIT_SUCCESS;
 }
