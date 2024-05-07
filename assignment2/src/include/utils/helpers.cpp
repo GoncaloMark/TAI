@@ -79,11 +79,6 @@ namespace UTILS {
         }
     }
 
-    size_t strMemUsage(const std::string& str) {
-        // Calculate the memory usage of the string
-        return str.size() * sizeof(char);
-    }
-
     /* Specific functions to our problems */
 
     std::vector<std::vector<std::string>> readCSV(const std::filesystem::path& filename) {
@@ -146,5 +141,35 @@ namespace UTILS {
         }
 
         return data;
+    }
+
+    std::string readText(const std::filesystem::path &filePath) {
+        // Open the file
+        std::ifstream file(filePath);
+
+        // Check if the file is opened successfully
+        if (!file.is_open()) {
+            std::cerr << "Failed to open the file " << filePath << "!" << std::endl;
+            throw std::runtime_error("Failed to open the file!");
+        }
+        std::string text((std::istreambuf_iterator<char>(file)),
+                         (std::istreambuf_iterator<char>()));
+        file.close();
+        return text;
+    }
+
+    void processFile(const std::filesystem::path &filePath, const std::function<void(char)> &callback) {
+        std::ifstream file(filePath);
+        if (!file || !file.is_open()) {
+            std::cerr << "File is not open or accessible" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+
+        char curChar;
+        while(file.get(curChar)) {
+            callback(curChar);
+        }
+
+        file.close();
     }
 }
