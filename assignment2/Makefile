@@ -13,7 +13,7 @@ WAS_CHATTED_C_OBJS := $(WAS_CHATTED_C_SRC:%.cpp=${OUTPUT_DIR}/%.o)
 
 #* COMPILER STUFF
 CCOMPILER := g++
-CFLAGS := -c -O3 -Wall -Werror -I"./src/include" 
+CFLAGS := -c -O3 -Wall -Werror -I $(INCLUDE_DIR)
 
 #* TARGETS
 all: clean was_chatted 
