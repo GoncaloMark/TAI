@@ -21,12 +21,11 @@ int main(int argc, char **argv) {
     parser.registerArgType<double>("--alpha");
     parser.registerArgType<std::filesystem::path>("--rhModelPath");
     parser.registerArgType<std::filesystem::path>("--rcModelPath");
-    parser.registerArgType<std::filesystem::path>("--fileName");
+    parser.registerArgType<std::filesystem::path>("--textFile");
 
     parser.ParseArgs();
-
     try{
-        inputFileName = parser.GetArgValue<std::filesystem::path>("--fileName");
+        inputFileName = parser.GetArgValue<std::filesystem::path>("--textFile");
         rhDataPath = parser.GetArgValue<std::filesystem::path>("--rhModelPath");
         rcDataPath = parser.GetArgValue<std::filesystem::path>("--rcModelPath");
         kSize = parser.GetArgValue<int>("--kSize");
@@ -38,8 +37,7 @@ int main(int argc, char **argv) {
     }
 
     const auto& alphabet = UTILS::generateAsciiAlphabet();
-
-    std::string testText = "This isn't a test. i dont know what to do";
+    std::string testText = UTILS::readText(inputFileName);
 
     auto rhTexts = UTILS::readTextsFile(rhDataPath);
     FCM::FCMModel rhModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rhTexts);
