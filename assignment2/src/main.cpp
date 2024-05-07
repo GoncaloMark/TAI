@@ -37,16 +37,11 @@ int main(int argc, char **argv) {
     }
 
     // Program Execution
-
     const auto& alphabet = UTILS::generateAsciiAlphabet();
-
     std::string testText = UTILS::readText(testTextPath);
 
-    auto rhTexts = UTILS::readTextsFile(rhDataPath);
-    FCM::FCMModel rhModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rhTexts);
-
-    auto rcTexts = UTILS::readTextsFile(rcDataPath);
-    FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcTexts);
+    FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcDataPath);
+    FCM::FCMModel rhModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rhDataPath);
 
     std::cout << std::endl;
     std::cout << "Rh Model: " << std::endl;
