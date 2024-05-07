@@ -6,4 +6,5 @@ example/
 CMakeLists.txt
 cmake-build-debug/
 *.txt
+*.csv
 assignment2/renan_run.sh
