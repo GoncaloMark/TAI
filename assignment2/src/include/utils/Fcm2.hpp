@@ -11,7 +11,9 @@
 #include <unordered_set>
 #include <cmath>
 #include <chrono>
+#include "csv.hpp"
 #include "helpers.hpp"
+
 
 
 namespace FCM {
@@ -41,6 +43,7 @@ namespace FCM {
                 kSize(kSize), alpha(alpha), alphabet(alphabet), contCounter(contCounter), fcmFreq(fcmFreq) {
         }
 
+        static FCMCount generateBaseModel(const std::filesystem::path &dataPath, size_t k);
         static void updateFCMCount(const std::string &text, size_t k, FCMCount &fcmCount);
         static FCMCount generateFCMCount(const std::string &text, size_t k);
         static ContextCounter generateContextCounter(FCMCount &fcmCount);
@@ -50,14 +53,10 @@ namespace FCM {
                                        ContextCounter &contCounter);
         static double estimateProbability(double alpha, size_t alphabetSize, unsigned long contextCount,
                                           unsigned int contextSymCount);
-
         static void printFCMCount(const FCMCount &fcmCount);
         static void printFCMFreq(const FCMFreq& fcmFreq);
-
         static size_t fcmFreqMemUsage(const FCMFreq& fcmFreq, size_t k);
-
         static size_t contCounterMemUsage(const ContextCounter& contCounter, size_t k);
-
         static double calculateTextEntropy(
                 std::string &text,
                 size_t alphabetSize,
@@ -69,7 +68,8 @@ namespace FCM {
     public:
 
         static FCMModel
-        buildModel(size_t k, double alpha, const std::unordered_set<char> &alphabet, std::vector<std::string> &texts);
+        buildModel(size_t k, double alpha, const std::unordered_set<char> &alphabet,
+                   const std::filesystem::path &dataPath);
 
         static bool wasRewrittenChatGpt(std::string& text, FCMModel &rhModel, FCMModel &rcModel);
 

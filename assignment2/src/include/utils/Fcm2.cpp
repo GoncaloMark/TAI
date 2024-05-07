@@ -142,18 +142,8 @@ namespace FCM {
     }
 
     FCMModel FCMModel::buildModel(size_t k, double alpha, const std::unordered_set<char> &alphabet,
-                                  std::vector<std::string> &texts) {
-        auto start = std::chrono::high_resolution_clock::now();
-        FCMCount fcmCount;
-        for(auto& text: texts) {
-            if(text.size() <= k) {
-                continue;
-            }
-            updateFCMCount(text, k, fcmCount);
-        }
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-        std::cout << "Texts update - Execution time: " << duration.count()/1000000.0 << "s" << std::endl;
-
+                                  const std::filesystem::path &dataPath) {
+        FCMCount fcmCount = generateBaseModel(dataPath, k);
         ContextCounter contCounter = generateContextCounter(fcmCount);
         FCMFreq fcmFreq = generateFCMFreq(fcmCount, alpha, alphabet, contCounter);
         FCMModel model(k, alpha, alphabet, contCounter, fcmFreq);
@@ -197,5 +187,26 @@ namespace FCM {
         // rcModelNRC == rhModelNRC
         // TODO
         return true;
+    }
+
+    FCMCount FCMModel::generateBaseModel(const std::filesystem::path &dataPath, size_t k) {
+        auto start = std::chrono::high_resolution_clock::now();
+        FCMCount fcmCount;
+        csv::CSVReader reader(dataPath.string());
+        std::string text;
+        for (auto& row: reader) {
+            text = row[0].get<std::string>();
+            if(text.size() <= k) {
+                continue;
+            }
+            updateFCMCount(text, k, fcmCount);
+        }
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+
+        auto total_seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+        auto mins = std::chrono::duration_cast<std::chrono::minutes>(total_seconds);
+        auto secs = std::chrono::duration_cast<std::chrono::seconds>(total_seconds - mins);
+        std::cout << "Model text-feeding execution time: " << mins.count() << "m:" << secs.count() << "s" << std::endl;
+        return fcmCount;
     }
 }
