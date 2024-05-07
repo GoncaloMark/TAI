@@ -28,7 +28,7 @@ namespace FCM {
         const std::unordered_set<char>& alphabet;
         /*
          * Since we are creating it from the build method, we cannot pass as reference,
-         * otherwise it will get delete as the build method gets deleted.
+         * otherwise it will get delete as soon as the build method finishes.
          * */
         //
         const ContextCounter contCounter;
@@ -71,14 +71,25 @@ namespace FCM {
         static FCMModel
         buildModel(size_t k, double alpha, const std::unordered_set<char> &alphabet, std::vector<std::string> &texts);
 
-        void evaluateTestText(std::string& text) {
-            auto alphabetSize = static_cast<unsigned int>(alphabet.size());
-            double maxEntropy = log2(alphabetSize);
-            double testEntropy = calculateTextEntropy(text, alphabetSize, kSize, alpha, fcmFreq, contCounter);
-            double nrc = (maxEntropy - testEntropy) / maxEntropy;
+        static bool wasRewrittenChatGpt(std::string& text, FCMModel &rhModel, FCMModel &rcModel);
 
-            std::cout << "Test Text Entropy: " << testEntropy << std::endl;
-            std::cout << "Normalized Relative Compression (NRC): " << nrc << std::endl;
+        double getTextEntropy(std::string& text) {
+            return calculateTextEntropy(text, alphabet.size(), kSize, alpha, fcmFreq, contCounter);
+        }
+
+        double getModelMaxEntropy() {
+            return log2(static_cast<double>(alphabet.size()));
+        }
+
+        double getTextNRC(std::string& text) {
+            double maxEntropy = getModelMaxEntropy();
+            double textEntropy = getTextEntropy(text);
+            return (maxEntropy - textEntropy) / maxEntropy;
+        }
+
+        void evaluateText(std::string& text) {
+            std::cout << "Text Entropy: " << getTextEntropy(text) << std::endl;
+            std::cout << "Normalized Relative Compression (NRC): " << getTextNRC(text) << std::endl;
         }
 
     };

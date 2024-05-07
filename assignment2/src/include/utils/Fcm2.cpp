@@ -37,27 +37,21 @@ namespace FCM {
 
     FCMFreq FCMModel::generateFCMFreq(FCMCount &fcmCount, double alpha, const std::unordered_set<char> &alphabet,
                                       ContextCounter &contCounter) {
-        const double constTerm = static_cast<unsigned int>(alphabet.size()) * alpha;
+        size_t alphabetSize = alphabet.size();
 
         FCMFreq fcmFreq;
-        double denominator;
 
         for (auto& contextFreqDistPair : fcmCount) {
             const auto& context = contextFreqDistPair.first;
             auto& freqDist = contextFreqDistPair.second;
-
-            // get denominator
-            denominator = constTerm + static_cast<double>(contCounter[context]);
+            auto contextCount = contCounter[context];
 
             for(const auto& symbolCountPair : freqDist) {
                 auto symbol = symbolCountPair.first;
-                auto count = symbolCountPair.second;
-                fcmFreq[context][symbol] = (count + alpha)/denominator;
+                auto contextSymCount = symbolCountPair.second;
+                fcmFreq[context][symbol] = estimateProbability(alpha, alphabetSize, contextCount, contextSymCount);
             }
 
-            /*for(const auto symbol: alphabet) {
-                fcmFreq[context][symbol] = (freqDist[symbol] + alpha)/denominator;
-            }*/
         }
 
         return fcmFreq;
@@ -65,20 +59,16 @@ namespace FCM {
 
     FCMFreq FCMModel::generateFinalFCMFreq(FCMCount &fcmCount, double alpha, const std::unordered_set<char> &alphabet,
                                            ContextCounter &contCounter) {
-        const double constTerm = static_cast<unsigned int>(alphabet.size()) * alpha;
-
+        size_t alphabetSize = alphabet.size();
         FCMFreq fcmFreq;
-        double denominator;
 
         for (auto& contextFreqDistPair : fcmCount) {
             const auto& context = contextFreqDistPair.first;
             auto& freqDist = contextFreqDistPair.second;
-
-            // get denominator
-            denominator = constTerm + static_cast<double>(contCounter[context]);
+            auto contextCount = contCounter[context];
 
             for(const auto symbol: alphabet) {
-                fcmFreq[context][symbol] = (freqDist[symbol] + alpha)/denominator;
+                fcmFreq[context][symbol] = estimateProbability(alpha, alphabetSize, contextCount, freqDist[symbol]);
             }
         }
 
@@ -102,9 +92,7 @@ namespace FCM {
     double FCMModel::estimateProbability(double alpha, size_t alphabetSize, unsigned long contextCount,
                                          unsigned int contextSymCount) {
         const double constTerm = static_cast<unsigned int>(alphabetSize) * alpha;
-
-        double denominator = (constTerm + static_cast<double>(contextCount));
-        return (contextSymCount + alpha)/denominator;
+        return (contextSymCount + alpha)/(constTerm + static_cast<double>(contextCount));
     }
 
     double FCMModel::calculateTextEntropy(std::string &text, size_t alphabetSize, size_t k, double alpha, const FCMFreq &fcmFreq,
@@ -165,17 +153,9 @@ namespace FCM {
         }
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
         std::cout << "Texts update - Execution time: " << duration.count()/1000000.0 << "s" << std::endl;
+
         ContextCounter contCounter = generateContextCounter(fcmCount);
-
         FCMFreq fcmFreq = generateFCMFreq(fcmCount, alpha, alphabet, contCounter);
-        size_t model1Size = contCounterMemUsage(contCounter, k) + fcmFreqMemUsage(fcmFreq, k);
-        FCMFreq fcmFreq2 = generateFinalFCMFreq(fcmCount, alpha, alphabet, contCounter);
-        size_t model2Size = fcmFreqMemUsage(fcmFreq2, k);
-        std::cout << "Model size 1: " << model1Size << std::endl;
-        std::cout << "Model size 2: " << model2Size << std::endl;
-        double ratio = (static_cast<double>(model1Size) / static_cast<double>(model2Size) );
-        std::cout << "ratio: " << ratio * 100.0 << std::endl;
-
         FCMModel model(k, alpha, alphabet, contCounter, fcmFreq);
         return model;
     }
@@ -202,5 +182,20 @@ namespace FCM {
         size_t totalCountSize = contCounter.size() * longSize;
 
         return totalContextSize + totalCountSize;
+    }
+
+    bool FCMModel::wasRewrittenChatGpt(std::string &text, FCMModel &rhModel, FCMModel &rcModel) {
+        double rhModelNRC = rhModel.getTextNRC(text);
+        double rcModelNRC = rcModel.getTextNRC(text);
+
+        if(rcModelNRC > rhModelNRC) {
+            return false;
+        }
+        if(rcModelNRC < rhModelNRC) {
+            return true;
+        }
+        // rcModelNRC == rhModelNRC
+        // TODO
+        return true;
     }
 }
