@@ -48,11 +48,13 @@ int main(int argc, char **argv) {
     auto rcTexts = UTILS::readTextsFile(rcDataPath);
     FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcTexts);
 
+    std::cout << std::endl;
     std::cout << "Rh Model: " << std::endl;
     rhModel.evaluateText(testText);
     std::cout << std::endl;
     std::cout << "Rc Model: " << std::endl;
     rcModel.evaluateText(testText);
+    std::cout << std::endl;
 
     if(FCM::FCMModel::wasRewrittenChatGpt(testText, rhModel, rcModel)) {
         std::cout << "The text is likely rewritten by ChatGpt" << std::endl;
