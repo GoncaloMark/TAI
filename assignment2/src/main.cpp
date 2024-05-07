@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
     auto rcTexts = UTILS::readTextsFile(rcDataPath);
     FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcTexts);
 
-    rhModel.evaluateTestText(testText);
-    rcModel.evaluateTestText(testText);
+    rhModel.evaluateText(testText);
+    rcModel.evaluateText(testText);
 
     return EXIT_SUCCESS;
 }
