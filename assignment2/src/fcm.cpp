@@ -105,8 +105,16 @@ namespace FCM {
         double symEntropy;
 
         for (size_t i = 0; i < text.size() - k; ++i) {
-            context = text.substr(i, k);
-            nextSymbol = text[i + k];
+            //std::cout << text.size() << " - " << k << std::endl;
+            try {
+                context = text.substr(i, k);
+                nextSymbol = text[i + k];
+            } catch (const std::exception& e) {
+                std::cout << text.size() << " - " << k << std::endl;
+                std::cerr << "Error: " << e.what() << std::endl;
+                throw;
+            }
+            
 
             if(fcmFreq.find(context) != fcmFreq.end()) { // if context exists in FCM model
                 auto freqDist = fcmFreq.at(context);
@@ -211,14 +219,18 @@ namespace FCM {
     }
 
     void FCMModel::evaluate(const std::filesystem::path &testDataPath, FCMModel &rhModel, FCMModel &rcModel) {
-        auto texts = UTILS::readCSV(testDataPath);
         unsigned int hits, fails, count;
         hits = fails = count = 0;
-        for(auto entry: texts) {
-            auto text = entry[0];
+        std::string text;
+        int label;
+
+        csv::CSVReader reader(testDataPath.string());
+        for (auto& row: reader) {
+            text = row[0].get<std::string>();
+            label = row[1].get<int>();
             if(text.size() <= rhModel.getK() || text.size() <= rcModel.getK()) {
+                continue;
             }
-            int label = stoi(entry[1]);
             int prediction = static_cast<int>(wasRewrittenChatGpt(text, rhModel, rcModel));
             count++;
             if(label == prediction) {
@@ -227,6 +239,7 @@ namespace FCM {
                 fails++;
             }
         }
+
         std::cout << "Count: " << count << std::endl;
         std::cout << "Hits: " << hits << std::endl;
         std::cout << "Fails: " << fails << std::endl;

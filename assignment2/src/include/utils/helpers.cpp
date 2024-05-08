@@ -81,26 +81,6 @@ namespace UTILS {
 
     /* Specific functions to our problems */
 
-    std::vector<std::vector<std::string>> readCSV(const std::filesystem::path& filename) {
-        csv::CSVReader reader(filename.string());
-        std::vector<std::vector<std::string>> data;
-
-        for (auto& row: reader) {
-            std::vector<std::string> rowData;
-            std::string text = row[0].get<std::string>();
-            std::string label = row[1].get<std::string>();
-            if(label != "0" && label != "1") {
-                std::cout << "Error here! " << label << std::endl;
-                exit(EXIT_FAILURE);
-            }
-            rowData.push_back(text);
-            rowData.push_back(label);
-            data.push_back(rowData);
-        }
-
-        return data;
-    }
-
     std::vector<std::vector<std::string>> filter(const std::vector<std::vector<std::string>>& data, const std::string& label) {
         std::vector<std::vector<std::string>> filteredData;
         for(const auto& row: data) {

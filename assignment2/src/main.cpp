@@ -41,11 +41,14 @@ int main(int argc, char **argv) {
     std::unordered_set<char> alphabet = UTILS::generateAsciiAlphabet();
     alphabet.erase('\n');
 
-    std::string testText = UTILS::readText(testTextPath);
-
     FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcDataPath);
     FCM::FCMModel rhModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rhDataPath);
 
+    std::cout << std::endl;
+    std::cout << "//Evaluation//" << std::endl;
+    FCM::FCMModel::evaluate(testDataPath, rhModel, rcModel);
+
+    std::string testText = UTILS::readText(testTextPath);
     std::cout << std::endl;
     std::cout << "Rh Model: " << std::endl;
     rhModel.evaluateText(testText);
@@ -59,10 +62,6 @@ int main(int argc, char **argv) {
     } else {
         std::cout << "The text is likely rewritten by a Human User" << std::endl;
     }
-
-    std::cout << std::endl;
-    std::cout << "//Evaluation//" << std::endl;
-    FCM::FCMModel::evaluate(testDataPath, rhModel, rcModel);
 
 
     return EXIT_SUCCESS;
