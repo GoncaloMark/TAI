@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include "include/fcm.hpp"
 #include "include/argparser/argparser.hpp"
 #include "include/utils/Fcm2.hpp"
@@ -37,7 +36,9 @@ int main(int argc, char **argv) {
     }
 
     // Program Execution
-    const auto& alphabet = UTILS::generateAsciiAlphabet();
+    std::unordered_set<char> alphabet = UTILS::generateAsciiAlphabet();
+    alphabet.erase('\n');
+
     std::string testText = UTILS::readText(testTextPath);
 
     FCM::FCMModel rcModel = FCM::FCMModel::buildModel(kSize, alpha, alphabet, rcDataPath);
