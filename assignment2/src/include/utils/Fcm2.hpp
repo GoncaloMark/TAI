@@ -79,6 +79,10 @@ namespace FCM {
             return calculateTextEntropy(text, alphabet.size(), kSize, alpha, fcmFreq, contCounter);
         }
 
+        size_t getK() const {
+            return kSize;
+        }
+
         double getModelMaxEntropy() {
             return log2(static_cast<double>(alphabet.size()));
         }

@@ -216,6 +216,9 @@ namespace FCM {
         hits = fails = count = 0;
         for(auto entry: texts) {
             auto text = entry[0];
+            if(text.size() <= rhModel.getK() || text.size() <= rcModel.getK()) {
+                continue;
+            }
             int label = stoi(entry[1]);
             int prediction = static_cast<int>(wasRewrittenChatGpt(text, rhModel, rcModel));
             count++;
