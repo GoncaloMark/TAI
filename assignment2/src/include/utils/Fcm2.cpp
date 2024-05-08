@@ -212,9 +212,23 @@ namespace FCM {
 
     void FCMModel::evaluate(const std::filesystem::path &testDataPath, FCMModel &rhModel, FCMModel &rcModel) {
         auto texts = UTILS::readCSV(testDataPath);
-        for(auto text: texts) {
-            std::cout << text[0] << std::endl;
+        unsigned int hits, fails, count;
+        hits = fails = count = 0;
+        for(auto entry: texts) {
+            auto text = entry[0];
+            int label = stoi(entry[1]);
+            int prediction = static_cast<int>(wasRewrittenChatGpt(text, rhModel, rcModel));
+            count++;
+            if(label == prediction) {
+                hits++;
+            } else {
+                fails++;
+            }
         }
+        std::cout << "Count: " << count << std::endl;
+        std::cout << "Hits: " << hits << std::endl;
+        std::cout << "Fails: " << fails << std::endl;
+
 
     }
 }

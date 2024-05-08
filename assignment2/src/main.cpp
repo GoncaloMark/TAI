@@ -61,6 +61,8 @@ int main(int argc, char **argv) {
         std::cout << "The text is likely rewritten by a Human User" << std::endl;
     }
 
+    std::cout << std::endl;
+    std::cout << "//Evaluation//" << std::endl;
     FCM::FCMModel::evaluate(testDataPath, rhModel, rcModel);
 
 
