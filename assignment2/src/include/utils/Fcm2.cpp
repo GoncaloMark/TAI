@@ -209,4 +209,12 @@ namespace FCM {
         std::cout << "Model text-feeding execution time: " << mins.count() << "m:" << secs.count() << "s" << std::endl;
         return fcmCount;
     }
+
+    void FCMModel::evaluate(const std::filesystem::path &testDataPath, FCMModel &rhModel, FCMModel &rcModel) {
+        auto texts = UTILS::readCSV(testDataPath);
+        for(auto text: texts) {
+            std::cout << text[0] << std::endl;
+        }
+
+    }
 }

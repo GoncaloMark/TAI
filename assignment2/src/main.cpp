@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
     argv++;
 
     std::filesystem::path testTextPath;
+    std::filesystem::path testDataPath;
     std::filesystem::path rhDataPath;
     std::filesystem::path rcDataPath;
     int kSize;
@@ -20,6 +21,7 @@ int main(int argc, char **argv) {
     parser.registerArgType<double>("--alpha");
     parser.registerArgType<std::filesystem::path>("--rhModelPath");
     parser.registerArgType<std::filesystem::path>("--rcModelPath");
+    parser.registerArgType<std::filesystem::path>("--testDataPath");
     parser.registerArgType<std::filesystem::path>("--textFile");
 
     parser.ParseArgs();
@@ -27,6 +29,7 @@ int main(int argc, char **argv) {
         testTextPath = parser.GetArgValue<std::filesystem::path>("--textFile");
         rhDataPath = parser.GetArgValue<std::filesystem::path>("--rhModelPath");
         rcDataPath = parser.GetArgValue<std::filesystem::path>("--rcModelPath");
+        testDataPath = parser.GetArgValue<std::filesystem::path>("--testDataPath");
         kSize = parser.GetArgValue<int>("--kSize");
         alpha = parser.GetArgValue<double>("--alpha");
     } catch(const std::runtime_error& e){
@@ -57,6 +60,8 @@ int main(int argc, char **argv) {
     } else {
         std::cout << "The text is likely rewritten by a Human User" << std::endl;
     }
+
+    FCM::FCMModel::evaluate(testDataPath, rhModel, rcModel);
 
 
     return EXIT_SUCCESS;

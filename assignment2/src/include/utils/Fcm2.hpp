@@ -73,6 +73,8 @@ namespace FCM {
 
         static bool wasRewrittenChatGpt(std::string& text, FCMModel &rhModel, FCMModel &rcModel);
 
+        static void evaluate(const std::filesystem::path &testDataPath, FCMModel &rhModel, FCMModel &rcModel);
+
         double getTextEntropy(std::string& text) {
             return calculateTextEntropy(text, alphabet.size(), kSize, alpha, fcmFreq, contCounter);
         }
