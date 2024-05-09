@@ -186,11 +186,8 @@ namespace FCM {
         double rhModelNRC = rhModel.getTextNRC(text);
         double rcModelNRC = rcModel.getTextNRC(text);
 
-        if(rcModelNRC > rhModelNRC) {
-            return false;
-        }
         if(rcModelNRC < rhModelNRC) {
-            return true;
+            return false;
         }
         // rcModelNRC == rhModelNRC
         // TODO
