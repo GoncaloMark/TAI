@@ -79,37 +79,6 @@ namespace UTILS {
         }
     }
 
-    /* Specific functions to our problems */
-
-    std::vector<std::vector<std::string>> filter(const std::vector<std::vector<std::string>>& data, const std::string& label) {
-        std::vector<std::vector<std::string>> filteredData;
-        for(const auto& row: data) {
-            if(row[1] == label) {
-                filteredData.push_back(row);
-            }
-        }
-        return filteredData;
-    }
-
-    std::vector<std::string> getInput(const std::vector<std::vector<std::string>>& data) {
-        std::vector<std::string> input;
-        for (const auto& row : data) {
-            // Assuming the input is in the first column
-            input.push_back(row[0]);
-        }
-        return input;
-    }
-
-    std::vector<int> getOutput(const std::vector<std::vector<std::string>>& data) {
-        std::vector<int> output;
-        int value;
-        for (const auto& row : data) {
-            value = stoi(row[1]);
-            output.push_back(value);
-        }
-        return output;
-    }
-
     std::string readText(const std::filesystem::path &filePath) {
         // Open the file
         std::ifstream file(filePath);
