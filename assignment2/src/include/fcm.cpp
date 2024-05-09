@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream:assignment2/src/fcm.cpp
-#include "include/utils/fcm.hpp"
-=======
 #include "fcm.hpp"
->>>>>>> Stashed changes:assignment2/src/include/fcm.cpp
 
 namespace FCM {
 
