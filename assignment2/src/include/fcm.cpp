@@ -2,20 +2,6 @@
 
 namespace FCM {
 
-    void FCMModel::printFCMCount(const FCMCount &fcmCount) {
-        // Print the FCM fcmCount
-        for (const auto& contextFreqDistPair : fcmCount) {
-            const std::string& context = UTILS::escapeString(contextFreqDistPair.first);
-
-            std::cout << "Context: " << context << std::endl;
-            for (const auto& symbolCountPair : contextFreqDistPair.second) {
-                char symbol = symbolCountPair.first;
-                auto count = symbolCountPair.second;
-                std::cout << "  Symbol: " << symbol << ", Count: " << count << std::endl;
-            }
-        }
-    }
-
     void FCMModel::updateFCMCount(const std::string &text, size_t k, FCMCount &fcmCount) {
         std::string context;
         char nextSymbol;
@@ -27,12 +13,6 @@ namespace FCM {
             fcmCount[context][nextSymbol]++;
         }
 
-    }
-
-    FCMCount FCMModel::generateFCMCount(const std::string &text, size_t k) {
-        FCMCount fcmCount;
-        updateFCMCount(text, k, fcmCount);
-        return fcmCount;
     }
 
     FCMFreq FCMModel::generateFCMFreq(FCMCount &fcmCount, double alpha, const std::unordered_set<char> &alphabet,
@@ -57,28 +37,10 @@ namespace FCM {
         return fcmFreq;
     }
 
-    FCMFreq FCMModel::generateFinalFCMFreq(FCMCount &fcmCount, double alpha, const std::unordered_set<char> &alphabet,
-                                           ContextCounter &contCounter) {
-        size_t alphabetSize = alphabet.size();
-        FCMFreq fcmFreq;
-
-        for (auto& contextFreqDistPair : fcmCount) {
-            const auto& context = contextFreqDistPair.first;
-            auto& freqDist = contextFreqDistPair.second;
-            auto contextCount = contCounter[context];
-
-            for(const auto symbol: alphabet) {
-                fcmFreq[context][symbol] = estimateProbability(alpha, alphabetSize, contextCount, freqDist[symbol]);
-            }
-        }
-
-        return fcmFreq;
-    }
-
     void FCMModel::printFCMFreq(const FCMFreq &fcmFreq) {
         // Print the FCM fcmFreq
         for (const auto& contextFreqDistPair : fcmFreq) {
-            const auto& context = contextFreqDistPair.first;
+            const auto& context = UTILS::escapeString(contextFreqDistPair.first);
 
             std::cout << "Context: " << context << std::endl;
             for (const auto& symbolCountPair : contextFreqDistPair.second) {
@@ -105,7 +67,6 @@ namespace FCM {
         double symEntropy;
 
         for (size_t i = 0; i < text.size() - k; ++i) {
-            //std::cout << text.size() << " - " << k << std::endl;
             try {
                 context = text.substr(i, k);
                 nextSymbol = text[i + k];
@@ -158,30 +119,6 @@ namespace FCM {
         return model;
     }
 
-    size_t FCMModel::fcmFreqMemUsage(const FCMFreq &fcmFreq, size_t k) {
-        size_t charSize = sizeof(char);
-        size_t doubleSize = sizeof(double);
-
-        size_t totalContextSize = fcmFreq.size() * k * charSize;
-
-        size_t totalSize = totalContextSize;
-        for (const auto& ContextFreqDist : fcmFreq) {
-            auto& freqDist = ContextFreqDist.second;
-            totalSize += freqDist.size() * (charSize + doubleSize);
-        }
-        return totalSize;
-    }
-
-    size_t FCMModel::contCounterMemUsage(const ContextCounter &contCounter, size_t k) {
-        size_t charSize = sizeof(char);
-        size_t longSize = sizeof(unsigned long);
-
-        size_t totalContextSize = contCounter.size() * k * charSize;
-        size_t totalCountSize = contCounter.size() * longSize;
-
-        return totalContextSize + totalCountSize;
-    }
-
     bool FCMModel::wasRewrittenChatGpt(std::string &text, FCMModel &rhModel, FCMModel &rcModel) {
         double rhModelNRC = rhModel.getTextNRC(text);
         double rcModelNRC = rcModel.getTextNRC(text);
@@ -189,7 +126,7 @@ namespace FCM {
         if(rcModelNRC < rhModelNRC) {
             return false;
         }
-        // rcModelNRC == rhModelNRC
+        // rcModelNRC >= rhModelNRC
         // TODO
         return true;
     }

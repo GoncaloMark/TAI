@@ -1,7 +1,10 @@
-//
-// Created by renan on 05/05/24.
-//
 #include "helpers.hpp"
+
+#include <iostream>
+#include <fstream>
+#include <filesystem>
+#include <string>
+#include <unordered_set>
 
 namespace UTILS {
     std::unordered_set<char> generateAsciiAlphabet() {
@@ -10,15 +13,6 @@ namespace UTILS {
             alphabet.insert(static_cast<char>(i));
         }
         return alphabet;
-    }
-
-    size_t hashContext(const std::string& context) {
-
-        size_t hash = 0;
-        for (char c : context) {
-            hash = (hash * PRIME_NUMBER) + static_cast<size_t>(c);
-        }
-        return hash;
     }
 
     std::string escapeString(const std::string& str) {
@@ -42,43 +36,6 @@ namespace UTILS {
         return escapedStr;
     }
 
-    size_t getFileSizeBytes(const std::filesystem::path& filePath) {
-        try {
-            std::uintmax_t fileSize = std::filesystem::file_size(filePath);
-            return static_cast<size_t>(fileSize);
-        } catch (const std::filesystem::filesystem_error& e) {
-            std::cerr << "Error accessing file: " << e.what() << std::endl;
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    size_t getFileSize(const std::filesystem::path& filePath) {
-        std::ifstream file(filePath);
-        if (!file.is_open()) {
-            std::cerr << "File is not open or accessible" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-
-        file.seekg(0, std::ios::end);
-        size_t size = file.tellg();
-        file.close();
-        return size;
-    }
-
-    bool fileExists(const std::filesystem::path& path) {
-        std::ifstream file(path);
-        return file.good();
-    }
-
-    void printCSV(const std::vector<std::vector<std::string>>& data) {
-        for (const auto& row : data) {
-            for (const auto& cell : row) {
-                std::cout << cell << ",";
-            }
-            std::cout << std::endl;
-        }
-    }
-
     std::string readText(const std::filesystem::path &filePath) {
         // Open the file
         std::ifstream file(filePath);
@@ -94,18 +51,4 @@ namespace UTILS {
         return text;
     }
 
-    void processFile(const std::filesystem::path &filePath, const std::function<void(char)> &callback) {
-        std::ifstream file(filePath);
-        if (!file || !file.is_open()) {
-            std::cerr << "File is not open or accessible" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-
-        char curChar;
-        while(file.get(curChar)) {
-            callback(curChar);
-        }
-
-        file.close();
-    }
 }

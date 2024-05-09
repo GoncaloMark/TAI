@@ -45,18 +45,12 @@ namespace FCM {
 
         static FCMCount generateBaseModel(const std::filesystem::path &dataPath, size_t k);
         static void updateFCMCount(const std::string &text, size_t k, FCMCount &fcmCount);
-        static FCMCount generateFCMCount(const std::string &text, size_t k);
         static ContextCounter generateContextCounter(FCMCount &fcmCount);
         static FCMFreq generateFCMFreq(FCMCount &fcmCount, double alpha, const std::unordered_set<char> &alphabet,
                                        ContextCounter &contCounter);
-        static FCMFreq generateFinalFCMFreq(FCMCount &fcmCount, double alpha, const std::unordered_set<char> &alphabet,
-                                       ContextCounter &contCounter);
         static double estimateProbability(double alpha, size_t alphabetSize, unsigned long contextCount,
                                           unsigned int contextSymCount);
-        static void printFCMCount(const FCMCount &fcmCount);
         static void printFCMFreq(const FCMFreq& fcmFreq);
-        static size_t fcmFreqMemUsage(const FCMFreq& fcmFreq, size_t k);
-        static size_t contCounterMemUsage(const ContextCounter& contCounter, size_t k);
         static double calculateTextEntropy(
                 std::string &text,
                 size_t alphabetSize,
@@ -93,7 +87,7 @@ namespace FCM {
             return (maxEntropy - textEntropy) / maxEntropy;
         }
 
-        void evaluateText(std::string& text) {
+        void evaluateText(std::string &text) {
             std::cout << "Text Entropy: " << getTextEntropy(text) << std::endl;
             std::cout << "Normalized Relative Compression (NRC): " << getTextNRC(text) << std::endl;
         }
