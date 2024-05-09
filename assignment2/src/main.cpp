@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/utils/fcm.hpp"
+#include "include/fcm.hpp"
 #include "include/argparser/argparser.hpp"
 #include "include/utils/helpers.hpp"
 
