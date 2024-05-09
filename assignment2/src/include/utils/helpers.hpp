@@ -30,8 +30,4 @@ namespace UTILS {
 
     /* Specific functions to our problems */
 
-    std::vector<std::vector<std::string>> filter(const std::vector<std::vector<std::string>>& data, const std::string& label);
-    std::vector<std::string> getInput(const std::vector<std::vector<std::string>>& data);
-    std::vector<int> getOutput(const std::vector<std::vector<std::string>>& data);
-
 }
