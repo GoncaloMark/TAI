@@ -5,5 +5,3 @@ example/
 # Clion
 CMakeLists.txt
 cmake-build-debug/
-*.txt
-*.csv
