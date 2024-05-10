@@ -37,6 +37,7 @@ This section contains steps that one can use to get their own copy of our progra
     ```
 
     Remember to get 'test.txt', 'dataTest.csv', 'rhModel.csv', 'rcModel.csv' in order to be able to fully test the program. We got our datasets from the following link: https://www.kaggle.com/datasets/jdragonxherrera/augmented-data-for-llm-detect-ai-generated-text/versions/1.
+  The provided files in the "dataset" folder are but a very small sample to allow new users to run the program from the get go.
 
 This will create the executables by compiling and linking the project. You can now test and run the appropriate shell script to test the programs.
 For example:
