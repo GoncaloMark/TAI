@@ -1,0 +1,7 @@
+.vscode/
+.idea/
+example/
+
+# Clion
+cmake-build-debug/
+*.csv
