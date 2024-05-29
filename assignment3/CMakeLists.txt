@@ -10,4 +10,5 @@ include_directories(src/include)
 add_executable(P3
         src/main.cpp
         src/AudioHandler.hpp
+        GetMaxFreqs/src/GetMaxFreqs.cpp
 )
