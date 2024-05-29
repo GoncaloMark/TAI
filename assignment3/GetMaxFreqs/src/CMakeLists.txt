@@ -1,4 +1,11 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
+
+# Set the project name
+project(Assignment3)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W")
 SET(CMAKE_C_FLAGS_RELEASE "-O3")
