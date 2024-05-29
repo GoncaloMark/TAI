@@ -30,10 +30,51 @@
 
 using namespace std;
 
+// Function to parse integer arguments safely
+int parseArg(const char* arg) {
+    char* end;
+    errno = 0;
+    long val = strtol(arg, &end, 10);
+    if (errno != 0 || *end != '\0' || val < 0) {
+        cerr << "Error: Invalid argument " << arg << endl;
+        exit(EXIT_FAILURE);
+    }
+    return static_cast<int>(val);
+}
+
+// Function to check and handle audio file errors
+void checkAudioFile(const SndfileHandle& audioFile) {
+    if (audioFile.error()) {
+        cerr << "Error: invalid audio file\n";
+        exit(EXIT_FAILURE);
+    }
+    if (audioFile.channels() != 2) {
+        cerr << "Error: currently supports only 2 channels\n";
+        exit(EXIT_FAILURE);
+    }
+    if (audioFile.samplerate() != 44100) {
+        cerr << "Error: currently supports only 44100 Hz of sample rate\n";
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Function to print help message
+void helpMessage() {
+    cerr << "Usage: GetMaxFreqs [ -v (verbose) ]" << endl;
+    cerr << "                   [ -w freqsFile ]" << endl;
+    cerr << "                   [ -ws winSize ]" << endl;
+    cerr << "                   [ -sh shift ]" << endl;
+    cerr << "                   [ -ds downSampling ]" << endl;
+    cerr << "                   [ -nf nFreqs ]" << endl;
+    cerr << "                   AudioFile" << endl;
+}
+
 int main (int argc, char* argv[]) {
 
+    // Declare variables
 	bool verbose { false };
 	char* oFName = nullptr;
+    string iFName;
 	ofstream os;
 	int ws { WS };
 	int sh { SH };
@@ -41,83 +82,49 @@ int main (int argc, char* argv[]) {
 	int nf { NF };
 
 	if(argc < 2) {
-		cerr << "Usage: GetMaxFreqs [ -v (verbose) ]" << endl;
-		cerr << "                   [ -w freqsFile ]" << endl;
-		cerr << "                   [ -ws winSize ]" << endl;
-		cerr << "                   [ -sh shift ]" << endl;
-		cerr << "                   [ -ds downSampling ]" << endl;
-		cerr << "                   [ -nf nFreqs ]" << endl;
-		cerr << "                   AudioFile" << endl;
-		return 1;
+        helpMessage();
+		return EXIT_FAILURE;
 	}
 
-	for(int n = 1 ; n < argc ; n++)
-		if(string(argv[n]) == "-v") {
-			verbose = true;
-			break;
-		}
+    // Parse arguments
+    for (int n = 1; n < argc; n++) {
+        if (string(argv[n]) == "-v") {
+            verbose = true;
+        } else if (string(argv[n]) == "-w" && n + 1 < argc) {
+            oFName = argv[n + 1];
+        } else if (string(argv[n]) == "-ws" && n + 1 < argc) {
+            ws = parseArg(argv[n + 1]);
+        } else if (string(argv[n]) == "-sh" && n + 1 < argc) {
+            sh = parseArg(argv[n + 1]);
+        } else if (string(argv[n]) == "-ds" && n + 1 < argc) {
+            ds = parseArg(argv[n + 1]);
+        } else if (string(argv[n]) == "-nf" && n + 1 < argc) {
+            nf = parseArg(argv[n + 1]);
+        }
+    }
+    iFName = argv[argc-1];
 
-	for(int n = 1 ; n < argc ; n++)
-		if(string(argv[n]) == "-w") {
-			oFName = argv[n+1];
-			break;
-		}
-
-	for(int n = 1 ; n < argc ; n++)
-		if(string(argv[n]) == "-ws") {
-			ws = atoi(argv[n+1]);
-			break;
-		}
-
-	for(int n = 1 ; n < argc ; n++)
-		if(string(argv[n]) == "-sh") {
-			sh = atoi(argv[n+1]);
-			break;
-		}
-
-	for(int n = 1 ; n < argc ; n++)
-		if(string(argv[n]) == "-ds") {
-			ds = atoi(argv[n+1]);
-			break;
-		}
-
-	for(int n = 1 ; n < argc ; n++)
-		if(string(argv[n]) == "-nf") {
-			nf = atoi(argv[n+1]);
-			break;
-		}
-
-	SndfileHandle audioFile { argv[argc-1] };
-	if(audioFile.error()) {
-		cerr << "Error: invalid audio file\n";
-		return 1;
-	}
-
-	if(audioFile.channels() != 2) {
-		cerr << "Error: currently supports only 2 channels\n";
-		return 1;
-	}
-
-	if(audioFile.samplerate() != 44100) {
-		cerr << "Error: currently supports only 44100 Hz of sample rate\n";
-		return 1;
-	}
-
-	if(verbose) {
-		printf("Sample rate : %d\n",  audioFile.samplerate());
-		printf("Channels    : %d\n",  audioFile.channels());
-		printf("Frames      : %ld\n", (long int)audioFile.frames());
-	}
+    // Start Program execution
+	SndfileHandle audioFile {iFName};
+    checkAudioFile(audioFile);
 
 	if(oFName != nullptr) {
 		os.open(oFName, ofstream::binary);
 		if(!os) {
 			cerr << "Warning: failed to open file to write\n";
 		}
-
 	}
 
-	short* samples = new short[audioFile.frames() << 1];
+    if(verbose) {
+        printf("Sample rate : %d\n",  audioFile.samplerate());
+        printf("Channels    : %d\n",  audioFile.channels());
+        printf("Frames      : %ld\n", (long int)audioFile.frames());
+    }
+
+    // Read audio samples
+    //vector<short> samples(audioFile.frames() * audioFile.channels());
+    //audioFile.read(samples.data(), samples.size());
+    short* samples = new short[audioFile.frames() * audioFile.channels()];
 	audioFile.readf(samples, audioFile.frames());
 
 	fftw_complex in[ws] = {}, out[ws];
@@ -158,9 +165,9 @@ int main (int argc, char* argv[]) {
 
 	}
 
-	delete[] samples;
-	fftw_destroy_plan(plan);
+    delete[] samples;
 
-	return 0 ;
+	fftw_destroy_plan(plan);
+	return EXIT_SUCCESS;
 }
 
