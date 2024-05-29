@@ -2,6 +2,10 @@
 .idea/
 example/
 
+build.linux/
+build.windows/
+sox-14.4.2/
+
 # Clion
 cmake-build-debug/
 *.csv
