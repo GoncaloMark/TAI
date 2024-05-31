@@ -96,12 +96,12 @@ void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, in
             power[k] = out[k][0] * out[k][0] + out[k][1] * out[k][1];
         }
 
-        unsigned maxPowerIdx[ws/2];
-        for(int k = 0 ; k < ws/2 ; ++k) {
+        vector<unsigned> maxPowerIdx(ws/2);
+        for(int k=0; k < static_cast<int>(maxPowerIdx.size()); ++k) {
             maxPowerIdx[k] = k;
         }
 
-        partial_sort(maxPowerIdx, maxPowerIdx + nf, maxPowerIdx + ws/2,[&power](int i, int j) { return power[i] > power[j]; });
+        partial_sort(maxPowerIdx.begin(), maxPowerIdx.begin() + nf, maxPowerIdx.end(),[&power](int i, int j) { return power[i] > power[j]; });
 
         if(os) {
             for(int i = 0 ; i < nf ; ++i) {
