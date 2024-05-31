@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
+#include <numeric>
 #include <vector>
 #include <sndfile.hh>
 #include <fftw3.h>
@@ -77,8 +78,9 @@ void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, in
     fftw_complex out[ws] = {};
 
     fftw_plan plan;
-    vector<double> power(ws/2);
     plan = fftw_plan_dft_1d(ws, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    vector<double> power(ws/2);
+    vector<unsigned> maxPowerIdx(ws/2);
 
     for(int n = 0 ; n <= (nFrames - ws * ds) / (sh * ds) ; ++n) {
 
@@ -87,7 +89,6 @@ void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, in
             for(int l = 1 ; l < ds ; ++l) {
                 in[k][0] += (int) samples[(n * (sh * ds) + k * ds + l) << 1] + samples[((n * (sh * ds) + k * ds + l) << 1) + 1];
             }
-
         }
 
         fftw_execute(plan);
@@ -96,11 +97,7 @@ void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, in
             power[k] = out[k][0] * out[k][0] + out[k][1] * out[k][1];
         }
 
-        vector<unsigned> maxPowerIdx(ws/2);
-        for(int k=0; k < static_cast<int>(maxPowerIdx.size()); ++k) {
-            maxPowerIdx[k] = k;
-        }
-
+        iota(maxPowerIdx.begin(), maxPowerIdx.end(), 0);
         partial_sort(maxPowerIdx.begin(), maxPowerIdx.begin() + nf, maxPowerIdx.end(),[&power](int i, int j) { return power[i] > power[j]; });
 
         if(os) {
