@@ -43,7 +43,7 @@ int parseArg(const char* arg) {
 }
 
 // Function to check and handle audio file errors
-void checkAudioFile(const SndfileHandle& audioFile) {
+void getAudioFile(const SndfileHandle& audioFile) {
     if (audioFile.error()) {
         cerr << "Error: invalid audio file\n";
         exit(EXIT_FAILURE);
@@ -56,6 +56,23 @@ void checkAudioFile(const SndfileHandle& audioFile) {
         cerr << "Error: currently supports only 44100 Hz of sample rate\n";
         exit(EXIT_FAILURE);
     }
+}
+
+SndfileHandle createAudioFile(const string& iFName) {
+    SndfileHandle audioFile{iFName};
+    if (audioFile.error()) {
+        cerr << "Error: invalid audio file\n";
+        exit(EXIT_FAILURE);
+    }
+    if (audioFile.channels() != 2) {
+        cerr << "Error: currently supports only 2 channels\n";
+        exit(EXIT_FAILURE);
+    }
+    if (audioFile.samplerate() != 44100) {
+        cerr << "Error: currently supports only 44100 Hz of sample rate\n";
+        exit(EXIT_FAILURE);
+    }
+    return audioFile;
 }
 
 // Function to print help message
@@ -105,8 +122,8 @@ int main (int argc, char* argv[]) {
     iFName = argv[argc-1];
 
     // Start Program execution
-	SndfileHandle audioFile {iFName};
-    checkAudioFile(audioFile);
+	SndfileHandle audioFile = createAudioFile(iFName);
+    //getAudioFile(audioFile);
 
 	if(oFName != nullptr) {
 		os.open(oFName, ofstream::binary);
@@ -123,11 +140,13 @@ int main (int argc, char* argv[]) {
 
     // Read audio samples
     //vector<short> samples(audioFile.frames() * audioFile.channels());
-    //audioFile.read(samples.data(), samples.size());
+    //audioFile.readf(samples.data(), audioFile.frames());
     short* samples = new short[audioFile.frames() * audioFile.channels()];
 	audioFile.readf(samples, audioFile.frames());
 
-	fftw_complex in[ws] = {}, out[ws];
+    fftw_complex in[ws] = {};
+    fftw_complex out[ws] = {};
+
 	fftw_plan plan;
 	double power[ws/2];
 	plan = fftw_plan_dft_1d(ws, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
