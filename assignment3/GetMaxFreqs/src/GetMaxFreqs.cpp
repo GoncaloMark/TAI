@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
+#include <vector>
 #include <sndfile.hh>
 #include <fftw3.h>
 
@@ -122,10 +123,10 @@ int main (int argc, char* argv[]) {
     }
 
     // Read audio samples
-    //vector<short> samples(audioFile.frames() * audioFile.channels());
-    //audioFile.readf(samples.data(), audioFile.frames());
-    short* samples = new short[audioFile.frames() * audioFile.channels()];
-	audioFile.readf(samples, audioFile.frames());
+    vector<short> samples(audioFile.frames() * audioFile.channels());
+    audioFile.readf(samples.data(), audioFile.frames());
+    //short* samples = new short[audioFile.frames() * audioFile.channels()];
+	//audioFile.readf(samples, audioFile.frames());
 
     fftw_complex in[ws] = {};
     fftw_complex out[ws] = {};
@@ -167,7 +168,7 @@ int main (int argc, char* argv[]) {
 
 	}
 
-    delete[] samples;
+    //delete[] samples;
 
 	fftw_destroy_plan(plan);
 	return EXIT_SUCCESS;
