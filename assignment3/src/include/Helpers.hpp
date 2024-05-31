@@ -2,15 +2,17 @@
 // Created by renan on 31/05/24.
 //
 
-#ifndef TAI_P3_HELPERS_HPP
-#define TAI_P3_HELPERS_HPP
+#pragma once
+
+#include <iostream>
+#include <algorithm>
 
 namespace UTILS {
 
     class Helpers {
-
+        // Function to parse integer arguments safely
+        static int parseArg(const char* arg);
     };
 
 } // UTILS
 
-#endif //TAI_P3_HELPERS_HPP
