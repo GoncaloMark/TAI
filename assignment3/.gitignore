@@ -10,3 +10,4 @@ sox-14.4.2/
 # Clion
 cmake-build-debug/
 *.csv
+*.freqs
