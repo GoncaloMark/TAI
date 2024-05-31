@@ -10,8 +10,9 @@
 namespace UTILS {
 
     class Helpers {
+    public:
         // Function to parse integer arguments safely
-        static int parseArg(const char* arg);
+        static int parseInt(const char* arg);
     };
 
 } // UTILS
