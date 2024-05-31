@@ -23,5 +23,6 @@ include_directories(bin/src/include)
 include_directories(src/include)
 
 add_executable(GetMaxFreqs src/GetMaxFreqs.cpp src/include/Helpers.cpp
-        src/include/Helpers.hpp)
+        src/include/Helpers.hpp
+        src/include/Constants.hpp)
 target_link_libraries(GetMaxFreqs sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
