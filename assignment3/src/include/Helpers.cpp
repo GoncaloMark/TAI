@@ -5,7 +5,7 @@
 #include "Helpers.hpp"
 
 namespace UTILS {
-    int Helpers::parseArg(const char *arg) {
+    int Helpers::parseInt(const char *arg) {
         char* end;
         errno = 0;
         long val = std::strtol(arg, &end, 10);
