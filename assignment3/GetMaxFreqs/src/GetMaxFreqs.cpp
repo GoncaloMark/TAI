@@ -42,22 +42,6 @@ int parseArg(const char* arg) {
     return static_cast<int>(val);
 }
 
-// Function to check and handle audio file errors
-void getAudioFile(const SndfileHandle& audioFile) {
-    if (audioFile.error()) {
-        cerr << "Error: invalid audio file\n";
-        exit(EXIT_FAILURE);
-    }
-    if (audioFile.channels() != 2) {
-        cerr << "Error: currently supports only 2 channels\n";
-        exit(EXIT_FAILURE);
-    }
-    if (audioFile.samplerate() != 44100) {
-        cerr << "Error: currently supports only 44100 Hz of sample rate\n";
-        exit(EXIT_FAILURE);
-    }
-}
-
 SndfileHandle createAudioFile(const string& iFName) {
     SndfileHandle audioFile{iFName};
     if (audioFile.error()) {
@@ -123,7 +107,6 @@ int main (int argc, char* argv[]) {
 
     // Start Program execution
 	SndfileHandle audioFile = createAudioFile(iFName);
-    //getAudioFile(audioFile);
 
 	if(oFName != nullptr) {
 		os.open(oFName, ofstream::binary);
@@ -152,27 +135,27 @@ int main (int argc, char* argv[]) {
 	plan = fftw_plan_dft_1d(ws, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	for(int n = 0 ; n <= (audioFile.frames() - ws * ds) / (sh * ds) ; ++n) {
+
 		for(int k = 0 ; k < ws ; ++k) { // Convert to mono and down-sample
-			in[k][0] = (int)samples[(n * (sh * ds) + k * ds) << 1] +
-			  samples[((n * (sh * ds) + k * ds) << 1) + 1];
+			in[k][0] = (int)samples[(n * (sh * ds) + k * ds) << 1] + samples[((n * (sh * ds) + k * ds) << 1) + 1];
 			for(int l = 1 ; l < ds ; ++l) {
-				in[k][0] += (int)samples[(n * (sh * ds) + k * ds + l) << 1] +
-				  samples[((n * (sh * ds) + k * ds + l) << 1) + 1];
+				in[k][0] += (int) samples[(n * (sh * ds) + k * ds + l) << 1] + samples[((n * (sh * ds) + k * ds + l) << 1) + 1];
 			}
 
 		}
 
 		fftw_execute(plan);
 
-		for(int k = 0 ; k < ws/2 ; ++k)
-			power[k] = out[k][0] * out[k][0] + out[k][1] * out[k][1];
+		for(int k = 0 ; k < ws/2 ; ++k) {
+            power[k] = out[k][0] * out[k][0] + out[k][1] * out[k][1];
+        }
 
 		unsigned maxPowerIdx[ws/2];
-		for(int k = 0 ; k < ws/2 ; ++k)
-			maxPowerIdx[k] = k;
+		for(int k = 0 ; k < ws/2 ; ++k) {
+            maxPowerIdx[k] = k;
+        }
 
-		partial_sort(maxPowerIdx, maxPowerIdx + nf, maxPowerIdx + ws/2,
-		  [&power](int i, int j) { return power[i] > power[j]; });
+		partial_sort(maxPowerIdx, maxPowerIdx + nf, maxPowerIdx + ws/2,[&power](int i, int j) { return power[i] > power[j]; });
 
 		if(os) {
 			for(int i = 0 ; i < nf ; ++i) {
