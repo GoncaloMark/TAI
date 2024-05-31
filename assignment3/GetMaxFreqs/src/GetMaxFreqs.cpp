@@ -93,7 +93,7 @@ void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, in
 
         fftw_execute(plan);
 
-        for(int k = 0 ; k < ws/2 ; ++k) {
+        for(int k = 0 ; k < static_cast<int>(power.size()); ++k) {
             power[k] = out[k][0] * out[k][0] + out[k][1] * out[k][1];
         }
 
