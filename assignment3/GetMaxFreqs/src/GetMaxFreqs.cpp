@@ -24,6 +24,8 @@
 #include <vector>
 #include <sndfile.hh>
 #include <fftw3.h>
+#include <sstream>
+#include <bitset>
 
 #define WS	1024	// Size of the window for computing the FFT
 #define SH	256		// Window overlap
@@ -73,17 +75,17 @@ void helpMessage() {
 }
 
 // Function to compute the FFT signature
-void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, int ds, int nf, ofstream& os) {
+string computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, int ds, int nf, ofstream& os) {
+    ostringstream oss;
+
     fftw_complex in[ws] = {};
     fftw_complex out[ws] = {};
 
-    fftw_plan plan;
-    plan = fftw_plan_dft_1d(ws, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_plan plan = fftw_plan_dft_1d(ws, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
     vector<double> power(ws/2);
     vector<unsigned> maxPowerIdx(ws/2);
 
     for(int n = 0 ; n <= (nFrames - ws * ds) / (sh * ds) ; ++n) {
-
         for(int k = 0 ; k < ws ; ++k) { // Convert to mono and down-sample
             in[k][0] = (int)samples[(n * (sh * ds) + k * ds) << 1] + samples[((n * (sh * ds) + k * ds) << 1) + 1];
             for(int l = 1 ; l < ds ; ++l) {
@@ -103,11 +105,26 @@ void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, in
         if(os) {
             for(int i = 0 ; i < nf ; ++i) {
                 // To store in a byte, truncate to a max of 255
-                os.put(maxPowerIdx[i] > 255 ? 255 : maxPowerIdx[i]);
+                auto c = maxPowerIdx[i] > 255 ? 255 : maxPowerIdx[i];
+                oss << bitset<8>(c); // Assume maxPowerIdx[i] fits in 8 bits
+                os.put(c);
             }
         }
+
     }
     fftw_destroy_plan(plan);
+    return oss.str();
+}
+
+// Function to print the vector of significant frequencies
+void printSignificantFreqs(const std::vector<std::vector<unsigned>>& significantFreqs) {
+    for (const auto& freqs : significantFreqs) {
+        std::cout << "Significant Frequencies: ";
+        for (unsigned freq : freqs) {
+            std::cout << freq << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 int main (int argc, char* argv[]) {
@@ -116,7 +133,6 @@ int main (int argc, char* argv[]) {
 	bool verbose { false };
     string oFName;
     string iFName;
-	ofstream os;
 	int ws { WS };
 	int sh { SH };
 	int ds { DS };
@@ -154,6 +170,7 @@ int main (int argc, char* argv[]) {
         printf("Frames      : %ld\n", (long int)audioFile.frames());
     }
 
+    ofstream os;
 	if(!oFName.empty()) {
 		os.open(oFName, ofstream::binary);
 		if(!os) {
@@ -166,7 +183,16 @@ int main (int argc, char* argv[]) {
     audioFile.readf(samples.data(), audioFile.frames());
     int nFrames = static_cast<int>(audioFile.frames());
 
-    computeFFTSig(samples, nFrames, ws, sh, ds, nf, os);
+    auto sig = computeFFTSig(samples, nFrames, ws, sh, ds, nf, os);
+    string ofname2 = "testtmp.freqs";
+    ofstream os2;
+    if(!ofname2.empty()) {
+        os2.open(ofname2, ofstream::binary);
+        if(!os2) {
+            cerr << "Warning: failed to open file to write\n";
+        }
+    }
+    os2.write(sig.c_str(), sig.size());
 
 	return EXIT_SUCCESS;
 }
