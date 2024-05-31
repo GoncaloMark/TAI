@@ -26,6 +26,7 @@
 #include <fftw3.h>
 #include <sstream>
 #include <bitset>
+#include "Helpers.hpp"
 
 #define WS	1024	// Size of the window for computing the FFT
 #define SH	256		// Window overlap
@@ -33,18 +34,6 @@
 #define NF	4		// Number of significant frequencies
 
 using namespace std;
-
-// Function to parse integer arguments safely
-int parseArg(const char* arg) {
-    char* end;
-    errno = 0;
-    long val = strtol(arg, &end, 10);
-    if (errno != 0 || *end != '\0' || val < 0) {
-        cerr << "Error: Invalid argument " << arg << endl;
-        exit(EXIT_FAILURE);
-    }
-    return static_cast<int>(val);
-}
 
 SndfileHandle createAudioFile(const string& iFName) {
     SndfileHandle audioFile{iFName};
@@ -75,8 +64,12 @@ void helpMessage() {
 }
 
 // Function to compute the FFT signature
-vector<unsigned char> computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, int ds, int nf) {
+vector<unsigned char> computeFFTSig(SndfileHandle& audioFile, int ws, int sh, int ds, int nf) {
     vector<unsigned char> binarySignature;
+
+    int nFrames = static_cast<int>(audioFile.frames());
+    vector<short> samples(nFrames * 2);
+    audioFile.readf(samples.data(), nFrames);
 
     fftw_complex in[ws] = {};
     fftw_complex out[ws] = {};
@@ -136,13 +129,13 @@ int main (int argc, char* argv[]) {
         } else if (string(argv[n]) == "-w" && n + 1 < argc) {
             oFName = argv[n + 1];
         } else if (string(argv[n]) == "-ws" && n + 1 < argc) {
-            ws = parseArg(argv[n + 1]);
+            ws = UTILS::Helpers::parseInt(argv[n + 1]);
         } else if (string(argv[n]) == "-sh" && n + 1 < argc) {
-            sh = parseArg(argv[n + 1]);
+            sh = UTILS::Helpers::parseInt(argv[n + 1]);
         } else if (string(argv[n]) == "-ds" && n + 1 < argc) {
-            ds = parseArg(argv[n + 1]);
+            ds = UTILS::Helpers::parseInt(argv[n + 1]);
         } else if (string(argv[n]) == "-nf" && n + 1 < argc) {
-            nf = parseArg(argv[n + 1]);
+            nf = UTILS::Helpers::parseInt(argv[n + 1]);
         }
     }
     iFName = argv[argc-1];
@@ -164,12 +157,7 @@ int main (int argc, char* argv[]) {
 		}
 	}
 
-    // Read audio samples
-    vector<short> samples(audioFile.frames() * audioFile.channels());
-    audioFile.readf(samples.data(), audioFile.frames());
-    int nFrames = static_cast<int>(audioFile.frames());
-
-    auto sig = computeFFTSig(samples, nFrames, ws, sh, ds, nf);
+    auto sig = computeFFTSig(audioFile, ws, sh, ds, nf);
     os.write(reinterpret_cast<const char*>(sig.data()), sig.size());
 
 	return EXIT_SUCCESS;
