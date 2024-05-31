@@ -1,16 +1,27 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.10)
 project(TAI_P3)
 
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Set compile options for all targets
+add_compile_options(-Wall -W)
+
+# Set build type specific compile options
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3")
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3")
+
+# Set the output directory for binaries
+set(BASE_DIR ${CMAKE_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/bin)
 
 include_directories(bin/src/include)
 include_directories(src/include)
 
-
-add_executable(P3
-        src/main.cpp
-        src/AudioHandler.hpp
-        GetMaxFreqs/src/GetMaxFreqs.cpp
-        src/include/Helpers.cpp
-        src/include/Helpers.hpp
-)
+add_executable(GetMaxFreqs src/GetMaxFreqs.cpp src/include/Helpers.cpp
+        src/include/Helpers.hpp)
+target_link_libraries(GetMaxFreqs sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
