@@ -77,7 +77,7 @@ void computeFFTSig(const vector<short>& samples, int nFrames, int ws, int sh, in
     fftw_complex out[ws] = {};
 
     fftw_plan plan;
-    double power[ws/2];
+    vector<double> power(ws/2);
     plan = fftw_plan_dft_1d(ws, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
     for(int n = 0 ; n <= (nFrames - ws * ds) / (sh * ds) ; ++n) {
