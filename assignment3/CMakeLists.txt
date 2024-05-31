@@ -11,4 +11,6 @@ add_executable(P3
         src/main.cpp
         src/AudioHandler.hpp
         GetMaxFreqs/src/GetMaxFreqs.cpp
+        src/include/Helpers.cpp
+        src/include/Helpers.hpp
 )
