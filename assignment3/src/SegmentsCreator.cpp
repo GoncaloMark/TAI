@@ -7,9 +7,9 @@
 #include "Constants.hpp"
 
 int main(int argc, char* argv[]) {
-    std::string inputDir = "", outputDir = "";
+    std::string inputDir, outputDir;
     int segmentDuration = Constants::SEGMENT_DUR;
-    float noiseLevel = Constants::NOISE_LEVEL; 
+    float noiseLevel = Constants::NOISE_LEVEL;
 
     // Parse and Validate Arguments
     std::map<std::string, std::string> args;
@@ -71,11 +71,9 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: Input directory does not exist or is not a directory." << std::endl;
         return EXIT_FAILURE;
     }
-    if (!std::filesystem::exists(outputDir)) {
-        if (!std::filesystem::create_directories(outputDir)) {
-            std::cerr << "Error: Could not create output directory." << std::endl;
-            return EXIT_FAILURE;
-        }
+    if (!std::filesystem::exists(outputDir) && !std::filesystem::create_directories(outputDir)) {
+        std::cerr << "Error: Could not create output directory." << std::endl;
+        return EXIT_FAILURE;
     }
 
     // Start processing audio files
@@ -93,11 +91,9 @@ int main(int argc, char* argv[]) {
             }
 
             std::string trackOutputDir = outputDir + "/" + entry.path().stem().string();
-            if (!std::filesystem::exists(trackOutputDir)) {
-                if (!std::filesystem::create_directories(trackOutputDir)) {
-                    std::cerr << "Error: Could not create directory for track " << trackOutputDir << std::endl;
-                    continue;
-                }
+            if (!std::filesystem::exists(trackOutputDir) && !std::filesystem::create_directories(trackOutputDir)) {
+                std::cerr << "Error: Could not create directory for track " << trackOutputDir << std::endl;
+                continue;
             }
 
             int sampleRate = fileHandle.samplerate();
