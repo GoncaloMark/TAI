@@ -4,7 +4,7 @@ bin/
 example/
 
 build/
-sox-14.4.2/
+data/audio_segments/
 
 # Clion
 cmake-build-debug/
