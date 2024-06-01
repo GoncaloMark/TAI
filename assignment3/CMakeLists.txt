@@ -19,10 +19,24 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3")
 set(BASE_DIR ${CMAKE_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/bin)
 
-include_directories(bin/src/include)
-include_directories(src/include)
+include_directories(${CMAKE_SOURCE_DIR}/src/include)
 
-add_executable(GetMaxFreqs src/GetMaxFreqs.cpp src/include/Helpers.cpp
+add_executable(GetMaxFreqs src/GetMaxFreqs.cpp
         src/include/Helpers.hpp
-        src/include/Constants.hpp)
+        src/include/Constants.hpp
+        src/Helpers.cpp)
+
+add_executable(MusicSigExtractor src/MusicSigExtractor.cpp
+        src/include/Helpers.hpp
+        src/include/Constants.hpp
+        src/Helpers.cpp)
+
+add_executable(SegmentCreator src/SegmentCreator.cpp
+        src/include/Helpers.hpp
+        src/include/Constants.hpp
+        src/Helpers.cpp)
+
+
 target_link_libraries(GetMaxFreqs sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
+target_link_libraries(MusicSigExtractor sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
+target_link_libraries(SegmentCreator sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
