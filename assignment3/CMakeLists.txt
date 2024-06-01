@@ -32,8 +32,10 @@ set(COMMON_SOURCES
 add_executable(GetMaxFreqs src/GetMaxFreqs.cpp ${COMMON_SOURCES})
 add_executable(MusicSigExtractor src/MusicSigExtractor.cpp ${COMMON_SOURCES})
 add_executable(SegmentCreator src/SegmentCreator.cpp ${COMMON_SOURCES})
+add_executable(SignaturesCreator src/SignaturesCreator.cpp ${COMMON_SOURCES})
 
 # Link libraries for all executables
-foreach(target IN ITEMS GetMaxFreqs MusicSigExtractor SegmentCreator)
+foreach(target IN ITEMS GetMaxFreqs MusicSigExtractor SegmentCreator SignaturesCreator)
     target_link_libraries(${target} sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
 endforeach()
+
