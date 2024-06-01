@@ -5,16 +5,6 @@
 #include "Helpers.hpp"
 #include "Constants.hpp"
 
-std::string getArgument(const std::map<std::string, std::string>& args, const std::string& shortOpt, const std::string& longOpt) {
-    if (args.find(shortOpt) != args.end()) {
-        return args.at(shortOpt);
-    }
-    if (args.find(longOpt) != args.end()) {
-        return args.at(longOpt);
-    }
-    return "";
-}
-
 int main(int argc, char* argv[]) {
     std::string inputDir = "", outputDir = "";
     int segmentDuration = Constants::SEGMENT_DUR;
