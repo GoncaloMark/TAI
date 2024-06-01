@@ -8,6 +8,7 @@
 #include <fstream>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 #include <algorithm>
 #include <numeric>
 #include <vector>
@@ -37,6 +38,8 @@ namespace UTILS {
         * @return A vector of unsigned char containing the binary signature of the audio file.
         */
         std::vector<unsigned char> computeFFTSignature(SndfileHandle& audioFile, int ws, int sh, int ds, int nf);
+
+        void createSegments(const std::string& inputFilePath, const std::string& outputDir, int segmentDuration);
 
 } // UTILS
 
