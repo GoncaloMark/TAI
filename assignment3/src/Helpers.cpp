@@ -2,6 +2,7 @@
 // Created by renan on 31/05/24.
 //
 
+
 #include "include/Helpers.hpp"
 
 namespace UTILS {
@@ -74,5 +75,34 @@ namespace UTILS {
         fftw_free(out);
 
         return binarySignature;
+    }
+
+    void createSegments(const std::string& inputFilePath, const std::string& outputDir, int segmentDuration) {
+        SndfileHandle fileHandle(inputFilePath);
+        if (fileHandle.error()) {
+            std::cerr << "Error reading audio file: " << inputFilePath << std::endl;
+            return;
+        }
+
+        int sampleRate = fileHandle.samplerate();
+        int channels = fileHandle.channels();
+        int framesPerSegment = segmentDuration * sampleRate;
+
+        std::vector<short> buffer(framesPerSegment * channels);
+        int segmentNumber = 0;
+        int readCount = 0;
+
+        while ((readCount = fileHandle.readf(buffer.data(), framesPerSegment)) > 0) {
+            std::string outputFilePath = outputDir + "/" + std::filesystem::path(inputFilePath).stem().string() +
+                                         "_segment_" + std::to_string(segmentNumber++) + ".wav";
+
+            SndfileHandle outFile(outputFilePath, SFM_WRITE, fileHandle.format(), channels, sampleRate);
+            if (outFile.error()) {
+                std::cerr << "Error writing segment file: " << outputFilePath << std::endl;
+                continue;
+            }
+
+            outFile.writef(buffer.data(), readCount);
+        }
     }
 } // UTILS
