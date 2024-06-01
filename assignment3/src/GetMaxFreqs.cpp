@@ -19,7 +19,6 @@
 #include <fstream>
 #include <algorithm>
 #include <sndfile.hh>
-#include <fftw3.h>
 #include <bitset>
 #include "Helpers.hpp"
 #include "Constants.hpp"
