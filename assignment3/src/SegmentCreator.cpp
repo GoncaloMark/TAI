@@ -1,52 +1,54 @@
 #include <iostream>
 #include <filesystem>
-#include <vector>
-#include <sndfile.hh>
+#include <map>
+#include <string>
+#include "Helpers.hpp"
 
-namespace fs = std::filesystem;
-
-void createSegments(const std::string& inputFilePath, const std::string& outputDir, int segmentDuration) {
-    SndfileHandle fileHandle(inputFilePath);
-    if (fileHandle.error()) {
-        std::cerr << "Error reading audio file: " << inputFilePath << std::endl;
-        return;
+bool validateArguments(const std::map<std::string, std::string>& args) {
+    if (args.find("-i") == args.end() || args.find("--input") == args.end()) {
+        std::cerr << "Error: Missing required argument -i or --input for input directory." << std::endl;
+        return false;
     }
-
-    int sampleRate = fileHandle.samplerate();
-    int channels = fileHandle.channels();
-    int framesPerSegment = segmentDuration * sampleRate;
-
-    std::vector<short> buffer(framesPerSegment * channels);
-    int segmentNumber = 0;
-    int readCount = 0;
-
-    while ((readCount = fileHandle.readf(buffer.data(), framesPerSegment)) > 0) {
-        std::string outputFilePath = outputDir + "/" + fs::path(inputFilePath).stem().string() +
-                                     "_segment_" + std::to_string(segmentNumber++) + ".wav";
-
-        SndfileHandle outFile(outputFilePath, SFM_WRITE, fileHandle.format(), channels, sampleRate);
-        if (outFile.error()) {
-            std::cerr << "Error writing segment file: " << outputFilePath << std::endl;
-            continue;
-        }
-
-        outFile.writef(buffer.data(), readCount);
+    if (args.find("-o") == args.end() || args.find("--output") == args.end()) {
+        std::cerr << "Error: Missing required argument -o or --output for output directory." << std::endl;
+        return false;
     }
+    if (args.find("-d") == args.end() || args.find("--duration") == args.end()) {
+        std::cerr << "Error: Missing required argument -d or --duration for segment duration." << std::endl;
+        return false;
+    }
+    try {
+        std::stoi(args.at("-d"));
+    } catch (...) {
+        std::cerr << "Error: Segment duration must be an integer." << std::endl;
+        return false;
+    }
+    return true;
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 4) {
-        std::cerr << "Usage: " << argv[0] << " <input_directory> <output_directory> <segment_duration>" << std::endl;
+    std::map<std::string, std::string> args;
+    for (int i = 1; i < argc; i += 2) {
+        if (i + 1 < argc && argv[i][0] == '-') {
+            args[argv[i]] = argv[i + 1];
+        } else {
+            std::cerr << "Error: Invalid argument format or missing value for " << argv[i] << std::endl;
+            return 1;
+        }
+    }
+
+    if (!validateArguments(args)) {
+        std::cerr << "Usage: " << argv[0] << " -i <input_directory> -o <output_directory> -d <segment_duration>" << std::endl;
         return 1;
     }
 
-    std::string inputDir = argv[1];
-    std::string outputDir = argv[2];
-    int segmentDuration = std::stoi(argv[3]);
+    std::string inputDir = args["-i"];
+    std::string outputDir = args["-o"];
+    int segmentDuration = std::stoi(args["-d"]);
 
-    for (const auto& entry : fs::directory_iterator(inputDir)) {
+    for (const auto& entry : std::filesystem::directory_iterator(inputDir)) {
         if (entry.path().extension() == ".wav") {
-            createSegments(entry.path().string(), outputDir, segmentDuration);
+            UTILS::createSegments(entry.path().string(), outputDir, segmentDuration);
         }
     }
 
