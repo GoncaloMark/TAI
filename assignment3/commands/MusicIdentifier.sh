@@ -1,0 +1,1 @@
+./bin/MusicIdentifier -q "AudioCoffee - Motivational Synthwave_0_noisy.sig" -d data/audio_signatures -m gzip

@@ -1,1 +1,0 @@
-./bin/SegmentExtractor -i "data/audio_tracks/AudioCoffee - Motivational Synthwave.wav" -d 10

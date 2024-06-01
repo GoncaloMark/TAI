@@ -99,4 +99,13 @@ namespace UTILS {
         std::vector<unsigned char> signature((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         return signature;
     }
+
+    void saveSignatureToFile(const std::vector<unsigned char>& signature, const std::string& filePath) {
+        std::ofstream outFile(filePath, std::ios::binary);
+        if (!outFile) {
+            throw std::runtime_error("Could not open file for writing: " + filePath);
+        }
+        outFile.write(reinterpret_cast<const char*>(signature.data()), signature.size());
+    }
+
 } // UTILS

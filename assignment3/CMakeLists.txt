@@ -33,10 +33,10 @@ set(COMMON_SOURCES
 # Add executables
 add_executable(SegmentsCreator src/SegmentsCreator.cpp ${COMMON_SOURCES})
 add_executable(SignaturesCreator src/SignaturesCreator.cpp ${COMMON_SOURCES})
-add_executable(SegmentExtractor src/NoiseAdder.cpp ${COMMON_SOURCES})
+add_executable(NoiseAdder src/NoiseAdder.cpp ${COMMON_SOURCES})
 add_executable(MusicIdentifier src/MusicIdentifier.cpp ${COMMON_SOURCES})
 
 # Link libraries for all executables
-foreach(target IN ITEMS SegmentsCreator SignaturesCreator SegmentExtractor MusicIdentifier)
-    target_link_libraries(${target} sox sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m BZip2 Zstd)
+foreach(target IN ITEMS SegmentsCreator SignaturesCreator NoiseAdder MusicIdentifier)
+    target_link_libraries(${target} sox sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 z lzma zstd bz2 m)
 endforeach()

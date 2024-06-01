@@ -1,14 +1,17 @@
 #include <iostream>
 #include <filesystem>
-#include <map>
-#include <random>
-#include <string>
 #include <sndfile.hh>
+#include <map>
 #include "Constants.hpp"
+#include "Helpers.hpp"
 
 int main(int argc, char* argv[]) {
-    std::string inputFilePath;
-    int segmentDuration = Constants::SEGMENT_DUR;
+    std::string inputFilePath, outputFilePath, signatureFilePath;
+    float noiseLevel = Constants::NOISE_LEVEL; // Default noise level
+    int windowSize = Constants::WINDOW_SIZE;
+    int shift = Constants::SHIFT;
+    int downSampling = Constants::DOWNSAMPLING;
+    int numFreqs = Constants::NUM_FREQS;
 
     // Parse and Validate Arguments
     std::map<std::string, std::string> args;
@@ -23,7 +26,17 @@ int main(int argc, char* argv[]) {
 
     if (args.find("-i") == args.end() && args.find("--input") == args.end()) {
         std::cerr << "Error: Missing required argument -i or --input for input file." << std::endl;
-        std::cerr << "Usage: SegmentExtractor -i <input_file> -d <segment_duration>" << std::endl;
+        std::cerr << "Usage: NoiseAdder -i <input_file> -o <output_file> -s <signature_file> -n <noise_level> -w <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
+        return EXIT_FAILURE;
+    }
+    if (args.find("-o") == args.end() && args.find("--output") == args.end()) {
+        std::cerr << "Error: Missing required argument -o or --output for output file." << std::endl;
+        std::cerr << "Usage: NoiseAdder -i <input_file> -o <output_file> -s <signature_file> -n <noise_level> -w <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
+        return EXIT_FAILURE;
+    }
+    if (args.find("-s") == args.end() && args.find("--signature") == args.end()) {
+        std::cerr << "Error: Missing required argument -s or --signature for signature file." << std::endl;
+        std::cerr << "Usage: NoiseAdder -i <input_file> -o <output_file> -s <signature_file> -n <noise_level> -w <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -33,14 +46,46 @@ int main(int argc, char* argv[]) {
         inputFilePath = args.at("--input");
     }
 
+    if (args.find("-o") != args.end()) {
+        outputFilePath = args.at("-o");
+    } else if (args.find("--output") != args.end()) {
+        outputFilePath = args.at("--output");
+    }
+
+    if (args.find("-s") != args.end()) {
+        signatureFilePath = args.at("-s");
+    } else if (args.find("--signature") != args.end()) {
+        signatureFilePath = args.at("--signature");
+    }
+
     try {
-        if (args.find("-d") != args.end()) {
-            segmentDuration = std::stoi(args.at("-d"));
-        } else if (args.find("--duration") != args.end()) {
-            segmentDuration = std::stoi(args.at("--duration"));
+        if (args.find("-n") != args.end()) {
+            noiseLevel = std::stof(args.at("-n"));
+        } else if (args.find("--noise") != args.end()) {
+            noiseLevel = std::stof(args.at("--noise"));
+        }
+        if (args.find("-w") != args.end()) {
+            windowSize = std::stoi(args.at("-w"));
+        } else if (args.find("--window") != args.end()) {
+            windowSize = std::stoi(args.at("--window"));
+        }
+        if (args.find("-sh") != args.end()) {
+            shift = std::stoi(args.at("-sh"));
+        } else if (args.find("--shift") != args.end()) {
+            shift = std::stoi(args.at("--shift"));
+        }
+        if (args.find("-ds") != args.end()) {
+            downSampling = std::stoi(args.at("-ds"));
+        } else if (args.find("--downsampling") != args.end()) {
+            downSampling = std::stoi(args.at("--downsampling"));
+        }
+        if (args.find("-nf") != args.end()) {
+            numFreqs = std::stoi(args.at("-nf"));
+        } else if (args.find("--num_freqs") != args.end()) {
+            numFreqs = std::stoi(args.at("--num_freqs"));
         }
     } catch (const std::exception& e) {
-        std::cerr << "Error: Argument <segment_duration> must be an integer. " << e.what() << std::endl;
+        std::cerr << "Error: Argument parsing error. " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -57,43 +102,19 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    if (fileHandle.samplerate() != Constants::SAMPLE_RATE) {
-        std::cerr << "Error: Audio file does not have a sample rate of " << Constants::SAMPLE_RATE << " Hz." << std::endl;
-        return EXIT_FAILURE;
-    }
-
     int sampleRate = fileHandle.samplerate();
     int channels = fileHandle.channels();
-    int totalFrames = fileHandle.frames();
-    int framesPerSegment = segmentDuration * sampleRate;
+    int frames = fileHandle.frames();
 
-    // Check if the audio file is long enough to extract a segment
-    if (totalFrames < framesPerSegment) {
-        std::cerr << "Error: Audio file is shorter than the requested segment duration." << std::endl;
-        return EXIT_FAILURE;
-    }
+    std::vector<short> buffer(frames * channels);
+    fileHandle.readf(buffer.data(), frames);
 
-    // Generate a random starting point for the segment
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0, totalFrames - framesPerSegment);
-    int startFrame = dist(gen);
+    // Add noise to the segment
+    UTILS::addNoiseToAudio(buffer, noiseLevel);
 
-    // Read the segment from the random starting point
-    std::vector<short> buffer(framesPerSegment * channels);
-    fileHandle.seek(startFrame, SEEK_SET);
-    int readCount = fileHandle.readf(buffer.data(), framesPerSegment);
-    if (readCount <= 0) {
-        std::cerr << "Error: Could not read frames from the input file." << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    // Generate output file path
-    std::string outputFilePath = std::filesystem::path(inputFilePath).stem().string() + "_segment_" + std::to_string(startFrame) + ".wav";
-
-    // Write the segment to the output file
+    // Write the noisy segment to the output file
     SF_INFO sfinfo;
-    sfinfo.frames = readCount;
+    sfinfo.frames = frames;
     sfinfo.samplerate = sampleRate;
     sfinfo.channels = channels;
     sfinfo.format = fileHandle.format();
@@ -104,12 +125,19 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    if (outFile.writef(buffer.data(), readCount) != readCount) {
+    if (outFile.writef(buffer.data(), frames) != frames) {
         std::cerr << "Error writing audio data to segment file: " << outputFilePath << std::endl;
         return EXIT_FAILURE;
     }
 
-    std::cout << "Segment extracted and saved to: " << outputFilePath << std::endl;
+    // Create signature for the noisy segment
+    SndfileHandle noisyFileHandle(outputFilePath);
+    auto signature = UTILS::computeFFTSignature(noisyFileHandle, windowSize, shift, downSampling, numFreqs);
+
+    // Save the signature to a file
+    UTILS::saveSignatureToFile(signature, signatureFilePath);
+
+    std::cout << "Noisy segment and signature saved to: " << outputFilePath << " and " << signatureFilePath << std::endl;
 
     return EXIT_SUCCESS;
 }

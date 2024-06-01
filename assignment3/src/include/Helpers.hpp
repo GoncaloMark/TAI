@@ -45,5 +45,9 @@ namespace UTILS {
     double computeNCD(const std::vector<unsigned char>& sig1, const std::vector<unsigned char>& sig2, COMPRESSOR::CompressionMethod method);
     std::vector<unsigned char> loadSignature(const std::string& filePath);
 
+    void addNoiseToAudio(std::vector<short>& samples, float noiseLevel);
+
+    void saveSignatureToFile(const std::vector<unsigned char>& signature, const std::string& filePath);
+
 } // UTILS
 
