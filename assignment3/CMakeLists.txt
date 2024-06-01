@@ -16,27 +16,24 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3")
 
 # Set the output directory for binaries
-set(BASE_DIR ${CMAKE_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
+# Include directories
 include_directories(${CMAKE_SOURCE_DIR}/src/include)
 
-add_executable(GetMaxFreqs src/GetMaxFreqs.cpp
+# List common source files
+set(COMMON_SOURCES
+        src/Helpers.cpp
         src/include/Helpers.hpp
         src/include/Constants.hpp
-        src/Helpers.cpp)
+)
 
-add_executable(MusicSigExtractor src/MusicSigExtractor.cpp
-        src/include/Helpers.hpp
-        src/include/Constants.hpp
-        src/Helpers.cpp)
+# Add executables
+add_executable(GetMaxFreqs src/GetMaxFreqs.cpp ${COMMON_SOURCES})
+add_executable(MusicSigExtractor src/MusicSigExtractor.cpp ${COMMON_SOURCES})
+add_executable(SegmentCreator src/SegmentCreator.cpp ${COMMON_SOURCES})
 
-add_executable(SegmentCreator src/SegmentCreator.cpp
-        src/include/Helpers.hpp
-        src/include/Constants.hpp
-        src/Helpers.cpp)
-
-
-target_link_libraries(GetMaxFreqs sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
-target_link_libraries(MusicSigExtractor sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
-target_link_libraries(SegmentCreator sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
+# Link libraries for all executables
+foreach(target IN ITEMS GetMaxFreqs MusicSigExtractor SegmentCreator)
+    target_link_libraries(${target} sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
+endforeach()
