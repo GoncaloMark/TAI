@@ -5,6 +5,7 @@ example/
 
 build/
 data/audio_signatures/
+data/audio_segments/
 
 # Clion
 cmake-build-debug/
