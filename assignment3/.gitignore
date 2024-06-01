@@ -3,8 +3,7 @@ bin/
 .idea/
 example/
 
-build.linux/
-build.windows/
+build/
 sox-14.4.2/
 
 # Clion
