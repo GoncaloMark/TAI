@@ -30,8 +30,9 @@ set(COMMON_SOURCES
 
 # Add executables
 add_executable(SegmentsCreator src/SegmentsCreator.cpp ${COMMON_SOURCES})
+add_executable(SignaturesCreator src/SignaturesCreator.cpp ${COMMON_SOURCES})
 
 # Link libraries for all executables
-foreach(target IN ITEMS SegmentsCreator)
+foreach(target IN ITEMS SegmentsCreator SignaturesCreator)
     target_link_libraries(${target} sox sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
 endforeach()
