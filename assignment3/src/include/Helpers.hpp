@@ -30,7 +30,7 @@ namespace UTILS {
         * the most significant frequencies in each window and stores their indices in
         * a binary format.
         *
-        * @param audioFile A reference to the SndfileHandle object representing the audio file.
+        * @param audioFile A reference to the Snd file Handle object representing the audio file.
         * @param ws The size of the window for computing the FFT (default is 1024).
         * @param sh The window overlap (default is 256).
         * @param ds The down-sampling factor (default is 4).

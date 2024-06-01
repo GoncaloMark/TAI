@@ -5,4 +5,5 @@ namespace Constants {
     const int SHIFT = 256;
     const int DOWNSAMPLING = 4;
     const int NUM_FREQS = 4;
+    const int SEGMENT_DUR = 10;
 }

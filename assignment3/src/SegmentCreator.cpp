@@ -3,54 +3,75 @@
 #include <map>
 #include <string>
 #include "Helpers.hpp"
+#include "Constants.hpp"
 
-bool validateArguments(const std::map<std::string, std::string>& args) {
-    if (args.find("-i") == args.end() || args.find("--input") == args.end()) {
-        std::cerr << "Error: Missing required argument -i or --input for input directory." << std::endl;
-        return false;
+std::string getArgument(const std::map<std::string, std::string>& args, const std::string& shortOpt, const std::string& longOpt) {
+    if (args.find(shortOpt) != args.end()) {
+        return args.at(shortOpt);
     }
-    if (args.find("-o") == args.end() || args.find("--output") == args.end()) {
-        std::cerr << "Error: Missing required argument -o or --output for output directory." << std::endl;
-        return false;
+    if (args.find(longOpt) != args.end()) {
+        return args.at(longOpt);
     }
-    if (args.find("-d") == args.end() || args.find("--duration") == args.end()) {
-        std::cerr << "Error: Missing required argument -d or --duration for segment duration." << std::endl;
-        return false;
-    }
-    try {
-        std::stoi(args.at("-d"));
-    } catch (...) {
-        std::cerr << "Error: Segment duration must be an integer." << std::endl;
-        return false;
-    }
-    return true;
+    return "";
 }
 
 int main(int argc, char* argv[]) {
+    std::string inputDir = "", outputDir = "";
+    int segmentDuration = Constants::SEGMENT_DUR;
+
+    // Parse and Validate Arguments
     std::map<std::string, std::string> args;
     for (int i = 1; i < argc; i += 2) {
         if (i + 1 < argc && argv[i][0] == '-') {
             args[argv[i]] = argv[i + 1];
         } else {
             std::cerr << "Error: Invalid argument format or missing value for " << argv[i] << std::endl;
-            return 1;
+            return EXIT_FAILURE;
         }
     }
-
-    if (!validateArguments(args)) {
-        std::cerr << "Usage: " << argv[0] << " -i <input_directory> -o <output_directory> -d <segment_duration>" << std::endl;
-        return 1;
+    if (args.find("-i") == args.end() && args.find("--input") == args.end()) {
+        std::cerr << "Error: Missing required argument -i or --input for input directory." << std::endl;
+        std::cerr << "Usage: SegmentCreator -i <input_directory> -o <output_directory> -d <segment_duration>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    if (args.find("-o") == args.end() && args.find("--output") == args.end()) {
+        std::cerr << "Error: Missing required argument -o or --output for output directory." << std::endl;
+        std::cerr << "Usage: SegmentCreator -i <input_directory> -o <output_directory> -d <segment_duration>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    try {
+        if (args.find("-d") != args.end()) {
+            std::stoi(args.at("-d"));
+        } else if(args.find("--duration") != args.end()) {
+            std::stoi(args.at("--duration"));
+        }
+    } catch (...) {
+        std::cerr << "Error: Segment duration must be an integer." << std::endl;
+        std::cerr << "Usage: SegmentCreator -i <input_directory> -o <output_directory> -d <segment_duration>" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    if (args.find("-i") != args.end()) {
+        inputDir = args.at("-i");
+    } else if (args.find("--input") != args.end()) {
+        inputDir = args.at("--input");
+    }
+    if (args.find("-o") != args.end()) {
+        outputDir = args.at("-o");
+    } else if (args.find("--output") != args.end()) {
+        outputDir = args.at("--output");
+    }
+    if (args.find("-d") != args.end()) {
+        segmentDuration = UTILS::parseInt(args.at("-d").c_str());
+    } else if (args.find("--duration") != args.end()) {
+        segmentDuration = UTILS::parseInt(args.at("--duration").c_str());
     }
 
-    std::string inputDir = args["-i"];
-    std::string outputDir = args["-o"];
-    int segmentDuration = std::stoi(args["-d"]);
-
+    // Start program
     for (const auto& entry : std::filesystem::directory_iterator(inputDir)) {
         if (entry.path().extension() == ".wav") {
             UTILS::createSegments(entry.path().string(), outputDir, segmentDuration);
         }
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

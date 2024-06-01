@@ -96,13 +96,22 @@ namespace UTILS {
             std::string outputFilePath = outputDir + "/" + std::filesystem::path(inputFilePath).stem().string() +
                                          "_segment_" + std::to_string(segmentNumber++) + ".wav";
 
-            SndfileHandle outFile(outputFilePath, SFM_WRITE, fileHandle.format(), channels, sampleRate);
+            SF_INFO sfinfo;
+            sfinfo.frames = readCount;
+            sfinfo.samplerate = sampleRate;
+            sfinfo.channels = channels;
+            sfinfo.format = fileHandle.format();
+
+            SndfileHandle outFile(outputFilePath.c_str(), SFM_WRITE, sfinfo.format, sfinfo.channels, sfinfo.samplerate);
             if (outFile.error()) {
                 std::cerr << "Error writing segment file: " << outputFilePath << std::endl;
+                std::cerr << "Error details: " << sf_strerror(NULL) << std::endl;  // Print the specific libsndfile error message
                 continue;
             }
 
-            outFile.writef(buffer.data(), readCount);
+            if (outFile.writef(buffer.data(), readCount) != readCount) {
+                std::cerr << "Error writing audio data to segment file: " << outputFilePath << std::endl;
+            }
         }
     }
 } // UTILS
