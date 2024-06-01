@@ -6,4 +6,5 @@ namespace Constants {
     const int DOWNSAMPLING = 4;
     const int NUM_FREQS = 4;
     const int SEGMENT_DUR = 10;
+    const int SAMPLE_RATE = 44100;
 }

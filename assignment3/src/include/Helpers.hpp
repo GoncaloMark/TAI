@@ -10,18 +10,20 @@
 #include <cstring>
 #include <filesystem>
 #include <algorithm>
+#include <samplerate.h>
 #include <numeric>
 #include <vector>
 #include <sndfile.hh>
 #include <fftw3.h>
 #include <sstream>
 #include <bitset>
+#include <sox.h>
+#include <random>
 
 namespace UTILS {
 
     // Function to parse integer arguments safely
     int parseInt(const char* arg);
-
     /**
     * Function to compute the FFT signature of an audio file.
     *
@@ -37,12 +39,9 @@ namespace UTILS {
     * @param nf The number of significant frequencies to identify (default is 4).
     * @return A vector of unsigned char containing the binary signature of the audio file.
     */
-    std::vector<unsigned char> computeFFTSignature(SndfileHandle& audioFile, int ws, int sh, int ds, int nf);
-
+    std::vector<unsigned char> computeFFTSignature(SndfileHandle &audioFile, int ws, int sh, int ds, int nf);
+    void addNoiseToAudio(std::vector<short>& samples, float noiseLevel);
     void createSegments(const std::string& inputFilePath, const std::string& outputDir, int segmentDuration);
-
-    std::vector<unsigned char> computeFFTSegmentSignature(const std::vector<short>& samples, int sampleRate, int channels, int ws, int sh, int ds, int nf);
-
 
 } // UTILS
 
