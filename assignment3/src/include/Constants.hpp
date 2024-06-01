@@ -7,4 +7,5 @@ namespace Constants {
     const int NUM_FREQS = 4;
     const int SEGMENT_DUR = 10;
     const int SAMPLE_RATE = 44100;
+    const float NOISE_LEVEL = 0.05;
 }
