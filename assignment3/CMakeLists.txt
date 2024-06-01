@@ -24,16 +24,19 @@ include_directories(${CMAKE_SOURCE_DIR}/src/include)
 # List common source files
 set(COMMON_SOURCES
         src/Helpers.cpp
+        src/Compressor.cpp
         src/include/Helpers.hpp
         src/include/Constants.hpp
+        src/include/Compressor.hpp
 )
 
 # Add executables
 add_executable(SegmentsCreator src/SegmentsCreator.cpp ${COMMON_SOURCES})
 add_executable(SignaturesCreator src/SignaturesCreator.cpp ${COMMON_SOURCES})
-add_executable(SegmentExtractor src/SegmentExtractor.cpp ${COMMON_SOURCES})
+add_executable(SegmentExtractor src/NoiseAdder.cpp ${COMMON_SOURCES})
+add_executable(MusicIdentifier src/MusicIdentifier.cpp ${COMMON_SOURCES})
 
 # Link libraries for all executables
-foreach(target IN ITEMS SegmentsCreator SignaturesCreator SegmentExtractor)
-    target_link_libraries(${target} sox sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m)
+foreach(target IN ITEMS SegmentsCreator SignaturesCreator SegmentExtractor MusicIdentifier)
+    target_link_libraries(${target} sox sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 m BZip2 Zstd)
 endforeach()

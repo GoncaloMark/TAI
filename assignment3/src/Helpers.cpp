@@ -78,42 +78,25 @@ namespace UTILS {
             sample += static_cast<short>(distribution(generator));
         }
     }
+    double computeNCD(const std::vector<unsigned char>& sig1, const std::vector<unsigned char>& sig2, COMPRESSOR::CompressionMethod method) {
+        auto compressedSig1 = COMPRESSOR::compress(sig1, method);
+        auto compressedSig2 = COMPRESSOR::compress(sig2, method);
+        auto compressedConcat = COMPRESSOR::compress(sig1, sig2, method);
 
-    void createSegments(const std::string& inputFilePath, const std::string& outputDir, int segmentDuration) {
-        SndfileHandle fileHandle(inputFilePath);
-        if (fileHandle.error()) {
-            std::cerr << "Error reading audio file: " << inputFilePath << std::endl;
-            return;
+        size_t Cx = compressedSig1.size();
+        size_t Cy = compressedSig2.size();
+        size_t Cxy = compressedConcat.size();
+
+        return (double)(Cxy - std::min(Cx, Cy)) / (double)std::max(Cx, Cy);
+    }
+
+    std::vector<unsigned char> loadSignature(const std::string& filePath) {
+        std::ifstream file(filePath, std::ios::binary);
+        if (!file) {
+            throw std::runtime_error("Could not open file: " + filePath);
         }
 
-        int sampleRate = fileHandle.samplerate();
-        int channels = fileHandle.channels();
-        int framesPerSegment = segmentDuration * sampleRate;
-
-        std::vector<short> buffer(framesPerSegment * channels);
-        int segmentNumber = 0;
-        int readCount = 0;
-
-        while ((readCount = fileHandle.readf(buffer.data(), framesPerSegment)) > 0) {
-            std::string outputFilePath = outputDir + "/" + std::filesystem::path(inputFilePath).stem().string() +
-                                         "_segment_" + std::to_string(segmentNumber++) + ".wav";
-
-            SF_INFO sfinfo;
-            sfinfo.frames = readCount;
-            sfinfo.samplerate = sampleRate;
-            sfinfo.channels = channels;
-            sfinfo.format = fileHandle.format();
-
-            SndfileHandle outFile(outputFilePath.c_str(), SFM_WRITE, sfinfo.format, sfinfo.channels, sfinfo.samplerate);
-            if (outFile.error()) {
-                std::cerr << "Error writing segment file: " << outputFilePath << std::endl;
-                std::cerr << "Error details: " << sf_strerror(NULL) << std::endl;  // Print the specific libsndfile error message
-                continue;
-            }
-
-            if (outFile.writef(buffer.data(), readCount) != readCount) {
-                std::cerr << "Error writing audio data to segment file: " << outputFilePath << std::endl;
-            }
-        }
+        std::vector<unsigned char> signature((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        return signature;
     }
 } // UTILS

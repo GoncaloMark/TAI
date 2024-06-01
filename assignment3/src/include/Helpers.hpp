@@ -19,6 +19,7 @@
 #include <bitset>
 #include <sox.h>
 #include <random>
+#include "Compressor.hpp"
 
 namespace UTILS {
 
@@ -41,7 +42,8 @@ namespace UTILS {
     */
     std::vector<unsigned char> computeFFTSignature(SndfileHandle &audioFile, int ws, int sh, int ds, int nf);
     void addNoiseToAudio(std::vector<short>& samples, float noiseLevel);
-    void createSegments(const std::string& inputFilePath, const std::string& outputDir, int segmentDuration);
+    double computeNCD(const std::vector<unsigned char>& sig1, const std::vector<unsigned char>& sig2, COMPRESSOR::CompressionMethod method);
+    std::vector<unsigned char> loadSignature(const std::string& filePath);
 
 } // UTILS
 
