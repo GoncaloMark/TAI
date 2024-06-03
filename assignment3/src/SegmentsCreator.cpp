@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Check for required arguments: input directory and output directory
     if (args.find("-i") == args.end() && args.find("--input") == args.end()) {
         std::cerr << "Error: Missing required argument -i or --input for input directory." << std::endl;
         std::cerr << "Usage: SegmentsCreator -i <input_directory> -o <output_directory> -d <segment_duration> -n <noise_level>" << std::endl;
@@ -33,6 +34,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    // Extract values from the parsed arguments
     try {
         if (args.find("-d") != args.end()) {
             segmentDuration = std::stoi(args.at("-d"));
@@ -90,6 +92,7 @@ int main(int argc, char* argv[]) {
                 continue;
             }
 
+            // Create a directory for each track in the output directory
             std::string trackOutputDir = outputDir + "/" + entry.path().stem().string();
             if (!std::filesystem::exists(trackOutputDir) && !std::filesystem::create_directories(trackOutputDir)) {
                 std::cerr << "Error: Could not create directory for track " << trackOutputDir << std::endl;
@@ -100,14 +103,17 @@ int main(int argc, char* argv[]) {
             int channels = fileHandle.channels();
             int framesPerSegment = segmentDuration * sampleRate;
 
+            // Buffer to store audio samples
             std::vector<short> buffer(framesPerSegment * channels);
             int segmentNumber = 0;
             int readCount = 0;
 
+            // Read and process audio segments
             while ((readCount = fileHandle.readf(buffer.data(), framesPerSegment)) > 0) {
                 // Add noise to the segment
                 UTILS::addNoiseToAudio(buffer, noiseLevel);
 
+                // Construct the output file path for the segment
                 std::string outputFilePath = trackOutputDir + "/" + std::to_string(segmentNumber++) + ".wav";
 
                 SF_INFO sfinfo;
@@ -116,6 +122,7 @@ int main(int argc, char* argv[]) {
                 sfinfo.channels = channels;
                 sfinfo.format = fileHandle.format();
 
+                // Write the noisy segment to the output file
                 SndfileHandle outFile(outputFilePath.c_str(), SFM_WRITE, sfinfo.format, sfinfo.channels, sfinfo.samplerate);
                 if (outFile.error()) {
                     std::cerr << "Error writing segment file: " << outputFilePath << std::endl;

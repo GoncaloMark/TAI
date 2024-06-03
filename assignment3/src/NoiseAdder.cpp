@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Check for required arguments: input file, output file, and signature file
     if (args.find("-i") == args.end() && args.find("--input") == args.end()) {
         std::cerr << "Error: Missing required argument -i or --input for input file." << std::endl;
         std::cerr << "Usage: NoiseAdder -i <input_file> -o <output_file> -s <signature_file> -n <noise_level> -w <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
@@ -40,6 +41,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    // Extract values from the parsed arguments
     if (args.find("-i") != args.end()) {
         inputFilePath = args.at("-i");
     } else if (args.find("--input") != args.end()) {
@@ -58,6 +60,7 @@ int main(int argc, char* argv[]) {
         signatureFilePath = args.at("--signature");
     }
 
+    // Optional arguments: noise level, window size, shift, downsampling, and number of frequencies
     try {
         if (args.find("-n") != args.end()) {
             noiseLevel = std::stof(args.at("-n"));
@@ -106,10 +109,11 @@ int main(int argc, char* argv[]) {
     int channels = fileHandle.channels();
     int frames = fileHandle.frames();
 
+    // Buffer to store audio samples
     std::vector<short> buffer(frames * channels);
     fileHandle.readf(buffer.data(), frames);
 
-    // Add noise to the segment
+    // Add noise to the audio samples
     UTILS::addNoiseToAudio(buffer, noiseLevel);
 
     // Write the noisy segment to the output file

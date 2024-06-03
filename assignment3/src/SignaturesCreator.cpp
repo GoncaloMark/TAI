@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Check for required arguments: input directory and output directory
     if (args.find("-i") == args.end() && args.find("--input") == args.end()) {
         std::cerr << "Error: Missing required argument -i or --input for input directory." << std::endl;
         std::cerr << "Usage: SignaturesCreator -i <input_directory> -o <output_directory> -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
@@ -32,6 +33,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    // Extract values from the parsed arguments
     if (args.find("-i") != args.end()) {
         inputDir = args.at("-i");
     } else if (args.find("--input") != args.end()) {
@@ -122,10 +124,13 @@ int main(int argc, char* argv[]) {
                         continue;
                     }
 
+                    // Compute the FFT signature of the audio segment
                     auto signature = UTILS::computeFFTSignature(fileHandle, ws, sh, ds, nf);
 
+                    // Construct the output file path for the signature
                     std::string outputFilePath = trackOutputDir + "/" + segmentEntry.path().stem().string() + ".sig";
 
+                    // Write the signature to the output file
                     std::ofstream outputFile(outputFilePath, std::ios::binary);
                     if (!outputFile) {
                         std::cerr << "Error opening output file: " << outputFilePath << std::endl;

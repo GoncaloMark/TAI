@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Check for the required arguments: query file, database directory, and compression method
     if (args.find("-q") == args.end() && args.find("--query") == args.end()) {
         std::cerr << "Error: Missing required argument -q or --query for query file." << std::endl;
         std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method>" << std::endl;
@@ -37,6 +38,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    // Extract values from the parsed arguments
     if (args.find("-q") != args.end()) {
         queryFilePath = args.at("-q");
     } else if (args.find("--query") != args.end()) {
@@ -55,6 +57,7 @@ int main(int argc, char* argv[]) {
         compressionMethodStr = args.at("--method");
     }
 
+    // Determine the compression method
     if (compressionMethodStr == "gzip") {
         compressionMethod = COMPRESSOR::CompressionMethod::GZIP;
     } else if (compressionMethodStr == "bzip2") {
@@ -68,7 +71,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    // Validate query file and database directory
+    // Validate the existence of the query file and the database directory
     if (!std::filesystem::exists(queryFilePath)) {
         std::cerr << "Error: Query file does not exist." << std::endl;
         return EXIT_FAILURE;
@@ -79,22 +82,26 @@ int main(int argc, char* argv[]) {
     }
 
     try {
-        // Load query signature
+        // Load query signature from the file
         auto querySignature = UTILS::loadSignature(queryFilePath);
 
-        // Iterate through database directory and compute NCD
+        // Initialize variables to find the best match
         double minNCD = std::numeric_limits<double>::max();
         std::string bestMatchTrack;
 
+        // Iterate through the database directory
         for (const auto& trackDir : std::filesystem::directory_iterator(databaseDir)) {
             if (trackDir.is_directory()) {
                 std::string trackName = trackDir.path().filename().string();
                 for (const auto& segmentFile : std::filesystem::directory_iterator(trackDir.path())) {
                     if (segmentFile.path().extension() == ".sig") {
+                        // Load the signature of the current segment
                         auto trackSignature = UTILS::loadSignature(segmentFile.path().string());
+                        // Compute the Normalized Compression Distance (NCD) between the query and track signatures
                         double ncd = UTILS::computeNCD(querySignature, trackSignature, compressionMethod);
                         std::cout << "NCD with " << segmentFile.path().filename() << " in track " << trackName << ": " << ncd << std::endl;
 
+                        // Update the best match if the current NCD is smaller
                         if (ncd < minNCD) {
                             minNCD = ncd;
                             bestMatchTrack = trackName;
@@ -104,6 +111,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // Print the best match track and its NCD
         std::cout << "Best match track: " << bestMatchTrack << " with NCD: " << minNCD << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
