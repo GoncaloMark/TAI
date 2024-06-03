@@ -1,5 +1,3 @@
-Sure! Here is a detailed `README.md` for your project:
-
 ```markdown
 # Audio Processing and Signature Generation
 
@@ -17,6 +15,10 @@ This project provides a set of tools for processing audio files, adding noise, s
 ```
 .
 ├── bin
+│   ├── MusicIdentifier
+│   ├── NoiseAdder
+│   ├── SegmentsCreator
+│   └── SignaturesCreator
 ├── build
 ├── cmake
 │   └── toolchains
@@ -24,22 +26,23 @@ This project provides a set of tools for processing audio files, adding noise, s
 │       └── windows.toolchain.cmake
 ├── CMakeLists.txt
 ├── commands
+│   ├── MusicIdentifier.sh
+│   ├── NoiseAdder.sh
+│   ├── SegmentsCreator.sh
 │   └── SignaturesCreator.sh
 ├── Makefile
-├── project_structure.txt
 ├── README.md
 └── src
+    ├── Compressor.cpp
     ├── Helpers.cpp
     ├── include
+    │   ├── Compressor.hpp
     │   ├── Constants.hpp
     │   └── Helpers.hpp
-    ├── Compressor.cpp
-    ├── include
-    │   ├── Compressor.hpp
-    └── SegmentsCreator.cpp
+    ├── MusicIdentifier.cpp
+    ├── NoiseAdder.cpp
+    ├── SegmentsCreator.cpp
     └── SignaturesCreator.cpp
-    └── NoiseAdder.cpp
-    └── MusicIdentifier.cpp
 ```
 
 ## Build Instructions
@@ -138,10 +141,6 @@ MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method>
 - `-d`, `--database`: Database directory containing FFT signatures of audio segments.
 - `-m`, `--method`: Compression method to use (gzip, bzip2, lzma, zstd).
 
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
-
 ## License
 
 This project is licensed under the MIT License.
@@ -156,5 +155,3 @@ This project is licensed under the MIT License.
 - [lzma](https://tukaani.org/xz/)
 - [zstd](https://facebook.github.io/zstd/)
 ```
-
-Feel free to replace `https://github.com/your_username/your_repository.git` with the actual URL of your GitHub repository and update any other information specific to your project.
