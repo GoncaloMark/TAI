@@ -183,7 +183,8 @@ namespace UTILS {
         if (!outFile) {
             throw std::runtime_error("Could not open file for writing: " + filePath);
         }
-        outFile.write(reinterpret_cast<const char*>(signature.data()), signature.size());
+
+        outFile.write(reinterpret_cast<const char*>(signature.data()), static_cast<long>(signature.size()));
     }
 
 } // namespace UTILS

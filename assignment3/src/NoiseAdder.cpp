@@ -104,10 +104,10 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error reading audio file: " << inputFilePath << std::endl;
         return EXIT_FAILURE;
     }
-
+    
     int sampleRate = fileHandle.samplerate();
     int channels = fileHandle.channels();
-    int frames = fileHandle.frames();
+    int frames = static_cast<int>(fileHandle.frames());
 
     // Buffer to store audio samples
     std::vector<short> buffer(frames * channels);

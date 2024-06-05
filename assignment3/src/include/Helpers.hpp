@@ -75,16 +75,6 @@ namespace UTILS {
     std::vector<unsigned char> loadSignature(const std::string& filePath);
 
     /**
-     * Function to add noise to an audio signal.
-     *
-     * This function adds Gaussian noise to each sample of the audio signal.
-     *
-     * @param samples A vector of audio samples to which noise will be added.
-     * @param noiseLevel The standard deviation of the Gaussian noise.
-     */
-    void addNoiseToAudio(std::vector<short>& samples, float noiseLevel);
-
-    /**
      * Function to save a binary signature to a file.
      *
      * This function writes the contents of a binary signature vector to a file.

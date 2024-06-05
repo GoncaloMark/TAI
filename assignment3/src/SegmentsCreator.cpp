@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
             int readCount = 0;
 
             // Read and process audio segments
-            while ((readCount = fileHandle.readf(buffer.data(), framesPerSegment)) > 0) {
+            while ((readCount = static_cast<int>(fileHandle.readf(buffer.data(), framesPerSegment))) > 0) {
                 // Add noise to the segment
                 UTILS::addNoiseToAudio(buffer, noiseLevel);
 

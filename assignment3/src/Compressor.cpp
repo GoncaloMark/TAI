@@ -33,7 +33,7 @@ namespace COMPRESSOR {
      */
     std::vector<unsigned char> compressBzip2(const std::vector<unsigned char>& data) {
         // Calculate the maximum size of the compressed data
-        unsigned int compressedSize = data.size() * 1.01 + 600;
+        auto compressedSize = static_cast<unsigned int>(static_cast<double>(data.size()) * 1.01 + 600);
         std::vector<unsigned char> compressedData(compressedSize);
 
         // Perform the compression

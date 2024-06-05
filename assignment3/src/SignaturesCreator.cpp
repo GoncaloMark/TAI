@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
                         continue;
                     }
 
-                    outputFile.write(reinterpret_cast<const char*>(signature.data()), signature.size());
+                    outputFile.write(reinterpret_cast<const char*>(signature.data()), static_cast<long>(signature.size()));
                     outputFile.close();
                 }
             }
