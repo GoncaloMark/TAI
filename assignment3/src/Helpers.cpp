@@ -130,7 +130,7 @@ namespace UTILS {
     }
 
     /**
-     * Function to compute the Normalized Compression Distance (NCD) between two signatures.
+     * Function to compute the Normalized Compression Distance (NCD) between two signatures using compression.
      *
      * This function computes the NCD between two binary signatures using the specified
      * compression method.
@@ -150,6 +150,20 @@ namespace UTILS {
         size_t Cxy = compressedConcat.size();
 
         return (double)(Cxy - std::min(Cx, Cy)) / (double)std::max(Cx, Cy);
+    }
+
+    /**
+     * Function to compute the Normalized Compression Distance (NCD) between two signatures without compression.
+     *
+     * This function computes the NCD between two binary signatures without using any compression.
+     *
+     * @param sig1 The first binary signature.
+     * @param sig2 The second binary signature.
+     * @return The computed NCD value.
+     */
+    double computeNCD(const std::vector<unsigned char>& sig1, const std::vector<unsigned char>& sig2) {
+        return static_cast<double>(sig1.size() + sig2.size() - std::min(sig1.size(), sig2.size())) /
+               static_cast<double>(std::max(sig1.size(), sig2.size()));
     }
 
 } // namespace UTILS
