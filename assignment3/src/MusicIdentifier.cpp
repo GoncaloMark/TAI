@@ -89,24 +89,20 @@ int main(int argc, char* argv[]) {
         double minNCD = std::numeric_limits<double>::max();
         std::string bestMatchTrack;
 
-        // Iterate through the database directory
-        for (const auto& trackDir : std::filesystem::directory_iterator(databaseDir)) {
-            if (trackDir.is_directory()) {
-                std::string trackName = trackDir.path().filename().string();
-                for (const auto& segmentFile : std::filesystem::directory_iterator(trackDir.path())) {
-                    if (segmentFile.path().extension() == ".sig") {
-                        // Load the signature of the current segment
-                        auto trackSignature = UTILS::loadSignature(segmentFile.path().string());
-                        // Compute the Normalized Compression Distance (NCD) between the query and track signatures
-                        double ncd = UTILS::computeNCD(querySignature, trackSignature, compressionMethod);
-                        std::cout << "NCD with " << segmentFile.path().filename() << " in track " << trackName << ": " << ncd << std::endl;
+        // Iterate through the signature files in the database directory
+        for (const auto& signatureFile : std::filesystem::directory_iterator(databaseDir)) {
+            if (signatureFile.path().extension() == ".sig") {
+                // Load the signature of the current segment
+                auto trackSignature = UTILS::loadSignature(signatureFile.path().string());
 
-                        // Update the best match if the current NCD is smaller
-                        if (ncd < minNCD) {
-                            minNCD = ncd;
-                            bestMatchTrack = trackName;
-                        }
-                    }
+                // Compute the Normalized Compression Distance (NCD) between the query and track signatures
+                double ncd = UTILS::computeNCD(querySignature, trackSignature, compressionMethod);
+                std::cout << "NCD with " << signatureFile.path().filename().string() << ": " << ncd << std::endl;
+
+                // Update the best match if the current NCD is smaller
+                if (ncd < minNCD) {
+                    minNCD = ncd;
+                    bestMatchTrack = signatureFile.path().stem().string(); // Use the file name (without extension) as the track name
                 }
             }
         }
