@@ -1,1 +1,0 @@
-./bin/SignaturesCreator -i data/audio_segments -o data/audio_signatures

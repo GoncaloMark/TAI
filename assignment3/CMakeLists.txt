@@ -31,11 +31,10 @@ set(COMMON_SOURCES
 )
 
 # Add executables
-add_executable(SignaturesCreator src/SignaturesCreator.cpp ${COMMON_SOURCES})
 add_executable(SegmentExtractor src/SegmentExtractor.cpp ${COMMON_SOURCES})
 add_executable(MusicIdentifier src/MusicIdentifier.cpp ${COMMON_SOURCES})
 
 # Link libraries for all executables
-foreach(target IN ITEMS SignaturesCreator SegmentExtractor MusicIdentifier)
+foreach(target IN ITEMS SegmentExtractor MusicIdentifier)
     target_link_libraries(${target} sox sndfile FLAC vorbisfile vorbis ogg vorbisenc fftw3 z lzma zstd bz2 m)
 endforeach()
