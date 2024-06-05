@@ -162,8 +162,10 @@ namespace UTILS {
      * @return The computed NCD value.
      */
     double computeNCD(const std::vector<unsigned char>& sig1, const std::vector<unsigned char>& sig2) {
-        return static_cast<double>(sig1.size() + sig2.size() - std::min(sig1.size(), sig2.size())) /
-               static_cast<double>(std::max(sig1.size(), sig2.size()));
+        size_t x = sig1.size();
+        size_t y = sig2.size();
+        size_t xy = sig1.size() + sig2.size();
+        return static_cast<double>(xy - std::min(x, y)) / static_cast<double>(std::max(x, y));
     }
 
 } // namespace UTILS
