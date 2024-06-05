@@ -13,7 +13,7 @@ std::string HelpMessage() {
 
 int main(int argc, char* argv[]) {
     std::string queryFilePath, databaseDir, compressionMethodStr;
-    COMPRESSOR::CompressionMethod compressionMethod = COMPRESSOR::CompressionMethod::GZIP; // Default method
+    COMPRESSOR::CompressionMethod compressionMethod;
     bool useCompression = false;
     int windowSize = Constants::WINDOW_SIZE;
     int shift = Constants::SHIFT;
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    // Determine the compression method if provided
+    // Determine the compression method if specified
     if (useCompression) {
         if (compressionMethodStr == "gzip") {
             compressionMethod = COMPRESSOR::CompressionMethod::GZIP;
@@ -146,9 +146,12 @@ int main(int argc, char* argv[]) {
                 auto trackSignature = UTILS::computeFFTSignature(trackFileHandle, windowSize, shift, downSampling, numFreqs);
 
                 // Compute the Normalized Compression Distance (NCD) between the query and track signatures
-                double ncd = useCompression ? UTILS::computeNCD(querySignature, trackSignature, compressionMethod)
-                                            : UTILS::computeNCD(querySignature, trackSignature);
-
+                double ncd;
+                if (useCompression) {
+                    ncd = UTILS::computeNCD(querySignature, trackSignature, compressionMethod);
+                } else {
+                    ncd = UTILS::computeNCD(querySignature, trackSignature);
+                }
                 std::cout << "NCD with " << audioFile.path().filename().string() << ": " << ncd << std::endl;
 
                 // Update the best match if the current NCD is smaller
