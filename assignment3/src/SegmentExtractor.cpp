@@ -5,6 +5,10 @@
 #include "Constants.hpp"
 #include "Helpers.hpp"
 
+std::string HelpMessage() {
+    return "Usage: SegmentExtractor -i <input_file> -o <output_file> -start <start_point> -dur <duration> -n <noise_level>";
+}
+
 int main(int argc, char* argv[]) {
     std::string inputFilePath, outputFilePath;
     float noiseLevel = Constants::NOISE_LEVEL; // Default noise level
@@ -25,12 +29,12 @@ int main(int argc, char* argv[]) {
     // Check for required arguments: input file and output file
     if (args.find("-i") == args.end() && args.find("--input") == args.end()) {
         std::cerr << "Error: Missing required argument -i or --input for input file." << std::endl;
-        std::cerr << "Usage: NoiseAdder -i <input_file> -o <output_file> -start <start_point> -dur <duration> -n <noise_level>" << std::endl;
+        std::cerr << HelpMessage() << std::endl;
         return EXIT_FAILURE;
     }
     if (args.find("-o") == args.end() && args.find("--output") == args.end()) {
         std::cerr << "Error: Missing required argument -o or --output for output file." << std::endl;
-        std::cerr << "Usage: NoiseAdder -i <input_file> -o <output_file> -start <start_point> -dur <duration> -n <noise_level>" << std::endl;
+        std::cerr << HelpMessage() << std::endl;
         return EXIT_FAILURE;
     }
 

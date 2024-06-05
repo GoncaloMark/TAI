@@ -7,9 +7,13 @@
 #include "Compressor.hpp"
 #include "Constants.hpp"
 
+std::string HelpMessage() {
+    return "Usage: MusicIdentifier -q <query_file> -d <database_dir> [-m <compression_method>] -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>";
+}
+
 int main(int argc, char* argv[]) {
     std::string queryFilePath, databaseDir, compressionMethodStr = "gzip"; // Default method
-    COMPRESSOR::CompressionMethod compressionMethod = COMPRESSOR::CompressionMethod::GZIP; // Default method
+    COMPRESSOR::CompressionMethod compressionMethod;
     int windowSize = Constants::WINDOW_SIZE;
     int shift = Constants::SHIFT;
     int downSampling = Constants::DOWNSAMPLING;
@@ -29,12 +33,12 @@ int main(int argc, char* argv[]) {
     // Check for the required arguments: query file and database directory
     if (args.find("-q") == args.end() && args.find("--query") == args.end()) {
         std::cerr << "Error: Missing required argument -q or --query for query file." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> [-m <compression_method>] -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
+        std::cerr << HelpMessage() << std::endl;
         return EXIT_FAILURE;
     }
     if (args.find("-d") == args.end() && args.find("--database") == args.end()) {
         std::cerr << "Error: Missing required argument -d or --database for database directory." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> [-m <compression_method>] -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
+        std::cerr << HelpMessage() << std::endl;
         return EXIT_FAILURE;
     }
 
