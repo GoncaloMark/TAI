@@ -152,39 +152,4 @@ namespace UTILS {
         return (double)(Cxy - std::min(Cx, Cy)) / (double)std::max(Cx, Cy);
     }
 
-    /**
-     * Function to load a binary signature from a file.
-     *
-     * This function reads the contents of a file and returns it as a vector of unsigned char.
-     *
-     * @param filePath The path to the signature file.
-     * @return A vector of unsigned char containing the binary signature.
-     */
-    std::vector<unsigned char> loadSignature(const std::string& filePath) {
-        std::ifstream file(filePath, std::ios::binary);
-        if (!file) {
-            throw std::runtime_error("Could not open file: " + filePath);
-        }
-
-        std::vector<unsigned char> signature((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        return signature;
-    }
-
-    /**
-     * Function to save a binary signature to a file.
-     *
-     * This function writes the contents of a binary signature vector to a file.
-     *
-     * @param signature A vector of unsigned char containing the binary signature.
-     * @param filePath The path to the file where the signature will be saved.
-     */
-    void saveSignatureToFile(const std::vector<unsigned char>& signature, const std::string& filePath) {
-        std::ofstream outFile(filePath, std::ios::binary);
-        if (!outFile) {
-            throw std::runtime_error("Could not open file for writing: " + filePath);
-        }
-
-        outFile.write(reinterpret_cast<const char*>(signature.data()), static_cast<long>(signature.size()));
-    }
-
 } // namespace UTILS
