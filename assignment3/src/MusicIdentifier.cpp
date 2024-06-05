@@ -8,7 +8,7 @@
 #include "Constants.hpp"
 
 int main(int argc, char* argv[]) {
-    std::string queryFilePath, databaseDir, compressionMethodStr;
+    std::string queryFilePath, databaseDir, compressionMethodStr = "gzip"; // Default method
     COMPRESSOR::CompressionMethod compressionMethod = COMPRESSOR::CompressionMethod::GZIP; // Default method
     int windowSize = Constants::WINDOW_SIZE;
     int shift = Constants::SHIFT;
@@ -26,20 +26,15 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Check for the required arguments: query file, database directory, and compression method
+    // Check for the required arguments: query file and database directory
     if (args.find("-q") == args.end() && args.find("--query") == args.end()) {
         std::cerr << "Error: Missing required argument -q or --query for query file." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method> -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
+        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> [-m <compression_method>] -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
         return EXIT_FAILURE;
     }
     if (args.find("-d") == args.end() && args.find("--database") == args.end()) {
         std::cerr << "Error: Missing required argument -d or --database for database directory." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method> -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
-        return EXIT_FAILURE;
-    }
-    if (args.find("-m") == args.end() && args.find("--method") == args.end()) {
-        std::cerr << "Error: Missing required argument -m or --method for compression method." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method> -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
+        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> [-m <compression_method>] -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
         return EXIT_FAILURE;
     }
 
