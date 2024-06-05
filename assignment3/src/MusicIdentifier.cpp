@@ -5,10 +5,15 @@
 #include <vector>
 #include "Helpers.hpp"
 #include "Compressor.hpp"
+#include "Constants.hpp"
 
 int main(int argc, char* argv[]) {
     std::string queryFilePath, databaseDir, compressionMethodStr;
     COMPRESSOR::CompressionMethod compressionMethod = COMPRESSOR::CompressionMethod::GZIP; // Default method
+    int windowSize = Constants::WINDOW_SIZE;
+    int shift = Constants::SHIFT;
+    int downSampling = Constants::DOWNSAMPLING;
+    int numFreqs = Constants::NUM_FREQS;
 
     // Parse and Validate Arguments
     std::map<std::string, std::string> args;
@@ -24,17 +29,17 @@ int main(int argc, char* argv[]) {
     // Check for the required arguments: query file, database directory, and compression method
     if (args.find("-q") == args.end() && args.find("--query") == args.end()) {
         std::cerr << "Error: Missing required argument -q or --query for query file." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method>" << std::endl;
+        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method> -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
         return EXIT_FAILURE;
     }
     if (args.find("-d") == args.end() && args.find("--database") == args.end()) {
         std::cerr << "Error: Missing required argument -d or --database for database directory." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method>" << std::endl;
+        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method> -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
         return EXIT_FAILURE;
     }
     if (args.find("-m") == args.end() && args.find("--method") == args.end()) {
         std::cerr << "Error: Missing required argument -m or --method for compression method." << std::endl;
-        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method>" << std::endl;
+        std::cerr << "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method> -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -55,6 +60,33 @@ int main(int argc, char* argv[]) {
         compressionMethodStr = args.at("-m");
     } else if (args.find("--method") != args.end()) {
         compressionMethodStr = args.at("--method");
+    }
+
+    // Optional arguments: window size, shift, downsampling, and number of frequencies
+    try {
+        if (args.find("-ws") != args.end()) {
+            windowSize = std::stoi(args.at("-ws"));
+        } else if (args.find("--window_size") != args.end()) {
+            windowSize = std::stoi(args.at("--window_size"));
+        }
+        if (args.find("-sh") != args.end()) {
+            shift = std::stoi(args.at("-sh"));
+        } else if (args.find("--shift") != args.end()) {
+            shift = std::stoi(args.at("--shift"));
+        }
+        if (args.find("-ds") != args.end()) {
+            downSampling = std::stoi(args.at("-ds"));
+        } else if (args.find("--downsampling") != args.end()) {
+            downSampling = std::stoi(args.at("--downsampling"));
+        }
+        if (args.find("-nf") != args.end()) {
+            numFreqs = std::stoi(args.at("-nf"));
+        } else if (args.find("--num_freqs") != args.end()) {
+            numFreqs = std::stoi(args.at("--num_freqs"));
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error: Argument parsing error. " << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
     // Determine the compression method
@@ -82,27 +114,41 @@ int main(int argc, char* argv[]) {
     }
 
     try {
-        // Load query signature from the file
-        auto querySignature = UTILS::loadSignature(queryFilePath);
+        // Load query audio file
+        SndfileHandle queryFileHandle(queryFilePath);
+        if (queryFileHandle.error()) {
+            std::cerr << "Error reading query audio file: " << queryFilePath << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        // Compute the FFT signature of the query audio file
+        auto querySignature = UTILS::computeFFTSignature(queryFileHandle, windowSize, shift, downSampling, numFreqs);
 
         // Initialize variables to find the best match
         double minNCD = std::numeric_limits<double>::max();
         std::string bestMatchTrack;
 
-        // Iterate through the signature files in the database directory
-        for (const auto& signatureFile : std::filesystem::directory_iterator(databaseDir)) {
-            if (signatureFile.path().extension() == ".sig") {
-                // Load the signature of the current segment
-                auto trackSignature = UTILS::loadSignature(signatureFile.path().string());
+        // Iterate through the audio files in the database directory
+        for (const auto& audioFile : std::filesystem::directory_iterator(databaseDir)) {
+            if (audioFile.path().extension() == ".wav") {
+                // Load the audio file
+                SndfileHandle trackFileHandle(audioFile.path().string());
+                if (trackFileHandle.error()) {
+                    std::cerr << "Error reading audio file: " << audioFile.path().string() << std::endl;
+                    continue;
+                }
+
+                // Compute the FFT signature of the current track
+                auto trackSignature = UTILS::computeFFTSignature(trackFileHandle, windowSize, shift, downSampling, numFreqs);
 
                 // Compute the Normalized Compression Distance (NCD) between the query and track signatures
                 double ncd = UTILS::computeNCD(querySignature, trackSignature, compressionMethod);
-                std::cout << "NCD with " << signatureFile.path().filename().string() << ": " << ncd << std::endl;
+                std::cout << "NCD with " << audioFile.path().filename().string() << ": " << ncd << std::endl;
 
                 // Update the best match if the current NCD is smaller
                 if (ncd < minNCD) {
                     minNCD = ncd;
-                    bestMatchTrack = signatureFile.path().stem().string(); // Use the file name (without extension) as the track name
+                    bestMatchTrack = audioFile.path().filename().string(); // Use the file name as the track name
                 }
             }
         }
