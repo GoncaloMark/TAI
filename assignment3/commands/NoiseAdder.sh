@@ -1,1 +1,0 @@
-./bin/NoiseAdder -i "data/audio_segments/AudioCoffee - Motivational Synthwave/0.wav" -o "AudioCoffee - Motivational Synthwave_0_noisy.wav" -s "AudioCoffee - Motivational Synthwave_0_noisy.sig"
