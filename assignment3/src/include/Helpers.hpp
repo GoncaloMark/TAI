@@ -2,18 +2,12 @@
 
 #include <iostream>
 #include <fstream>
-#include <cstdio>
-#include <cstring>
-#include <filesystem>
 #include <algorithm>
-#include <samplerate.h>
 #include <numeric>
 #include <vector>
 #include <sndfile.hh>
 #include <fftw3.h>
-#include <sstream>
 #include <bitset>
-#include <sox.h>
 #include <random>
 #include "Compressor.hpp"
 
