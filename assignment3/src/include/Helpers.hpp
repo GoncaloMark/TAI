@@ -51,7 +51,7 @@ namespace UTILS {
     void addNoiseToAudio(std::vector<short>& samples, float noiseLevel);
 
     /**
-     * Function to compute the Normalized Compression Distance (NCD) between two signatures.
+     * Function to compute the Normalized Compression Distance (NCD) between two signatures using compression.
      *
      * This function computes the NCD between two binary signatures using the specified
      * compression method.
@@ -62,5 +62,16 @@ namespace UTILS {
      * @return The computed NCD value.
      */
     double computeNCD(const std::vector<unsigned char>& sig1, const std::vector<unsigned char>& sig2, COMPRESSOR::CompressionMethod method);
+
+    /**
+     * Function to compute the Normalized Compression Distance (NCD) between two signatures without compression.
+     *
+     * This function computes the NCD between two binary signatures without using any compression.
+     *
+     * @param sig1 The first binary signature.
+     * @param sig2 The second binary signature.
+     * @return The computed NCD value.
+     */
+    double computeNCD(const std::vector<unsigned char>& sig1, const std::vector<unsigned char>& sig2);
 
 } // namespace UTILS
