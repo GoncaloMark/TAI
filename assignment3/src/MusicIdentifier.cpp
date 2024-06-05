@@ -12,8 +12,9 @@ std::string HelpMessage() {
 }
 
 int main(int argc, char* argv[]) {
-    std::string queryFilePath, databaseDir, compressionMethodStr = "gzip"; // Default method
-    COMPRESSOR::CompressionMethod compressionMethod;
+    std::string queryFilePath, databaseDir, compressionMethodStr;
+    COMPRESSOR::CompressionMethod compressionMethod = COMPRESSOR::CompressionMethod::GZIP; // Default method
+    bool useCompression = false;
     int windowSize = Constants::WINDOW_SIZE;
     int shift = Constants::SHIFT;
     int downSampling = Constants::DOWNSAMPLING;
@@ -57,8 +58,10 @@ int main(int argc, char* argv[]) {
 
     if (args.find("-m") != args.end()) {
         compressionMethodStr = args.at("-m");
+        useCompression = true;
     } else if (args.find("--method") != args.end()) {
         compressionMethodStr = args.at("--method");
+        useCompression = true;
     }
 
     // Optional arguments: window size, shift, downsampling, and number of frequencies
@@ -88,18 +91,20 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    // Determine the compression method
-    if (compressionMethodStr == "gzip") {
-        compressionMethod = COMPRESSOR::CompressionMethod::GZIP;
-    } else if (compressionMethodStr == "bzip2") {
-        compressionMethod = COMPRESSOR::CompressionMethod::BZIP2;
-    } else if (compressionMethodStr == "lzma") {
-        compressionMethod = COMPRESSOR::CompressionMethod::LZMA;
-    } else if (compressionMethodStr == "zstd") {
-        compressionMethod = COMPRESSOR::CompressionMethod::ZSTD;
-    } else {
-        std::cerr << "Error: Unsupported compression method. Supported methods are: gzip, bzip2, lzma, zstd." << std::endl;
-        return EXIT_FAILURE;
+    // Determine the compression method if provided
+    if (useCompression) {
+        if (compressionMethodStr == "gzip") {
+            compressionMethod = COMPRESSOR::CompressionMethod::GZIP;
+        } else if (compressionMethodStr == "bzip2") {
+            compressionMethod = COMPRESSOR::CompressionMethod::BZIP2;
+        } else if (compressionMethodStr == "lzma") {
+            compressionMethod = COMPRESSOR::CompressionMethod::LZMA;
+        } else if (compressionMethodStr == "zstd") {
+            compressionMethod = COMPRESSOR::CompressionMethod::ZSTD;
+        } else {
+            std::cerr << "Error: Unsupported compression method. Supported methods are: gzip, bzip2, lzma, zstd." << std::endl;
+            return EXIT_FAILURE;
+        }
     }
 
     // Validate the existence of the query file and the database directory
@@ -141,7 +146,9 @@ int main(int argc, char* argv[]) {
                 auto trackSignature = UTILS::computeFFTSignature(trackFileHandle, windowSize, shift, downSampling, numFreqs);
 
                 // Compute the Normalized Compression Distance (NCD) between the query and track signatures
-                double ncd = UTILS::computeNCD(querySignature, trackSignature, compressionMethod);
+                double ncd = useCompression ? UTILS::computeNCD(querySignature, trackSignature, compressionMethod)
+                                            : UTILS::computeNCD(querySignature, trackSignature);
+
                 std::cout << "NCD with " << audioFile.path().filename().string() << ": " << ncd << std::endl;
 
                 // Update the best match if the current NCD is smaller
