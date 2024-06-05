@@ -8,8 +8,8 @@
 int main(int argc, char* argv[]) {
     std::string inputFilePath, outputFilePath;
     float noiseLevel = Constants::NOISE_LEVEL; // Default noise level
-    int start = 0; // Starting point in seconds
-    int duration = Constants::SEGMENT_DUR; // Duration in seconds
+    int start = Constants::START_POINT; // Starting point in seconds
+    int duration = Constants::SEGMENT_DUR; // Default duration in seconds
 
     // Parse and Validate Arguments
     std::map<std::string, std::string> args;
