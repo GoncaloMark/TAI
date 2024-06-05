@@ -102,45 +102,30 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Process each track's segment directory
-    for (const auto& trackDirEntry : std::filesystem::directory_iterator(inputDir)) {
-        if (trackDirEntry.is_directory()) {
-            std::string trackName = trackDirEntry.path().stem().string();
-            std::string trackOutputDir = outputDir + "/" + trackName;
-
-            if (!std::filesystem::exists(trackOutputDir)) {
-                if (!std::filesystem::create_directories(trackOutputDir)) {
-                    std::cerr << "Error: Could not create directory for track " << trackOutputDir << std::endl;
-                    continue;
-                }
+    // Process each audio file in the input directory
+    for (const auto& trackEntry : std::filesystem::directory_iterator(inputDir)) {
+        if (trackEntry.path().extension() == ".wav") {
+            SndfileHandle fileHandle(trackEntry.path().string());
+            if (fileHandle.error()) {
+                std::cerr << "Error reading audio file: " << trackEntry.path().string() << std::endl;
+                continue;
             }
 
-            // Process each segment file in the track directory
-            for (const auto& segmentEntry : std::filesystem::directory_iterator(trackDirEntry.path())) {
-                if (segmentEntry.path().extension() == ".wav") {
-                    SndfileHandle fileHandle(segmentEntry.path().string());
-                    if (fileHandle.error()) {
-                        std::cerr << "Error reading audio file: " << segmentEntry.path().string() << std::endl;
-                        continue;
-                    }
+            // Compute the FFT signature of the audio file
+            auto signature = UTILS::computeFFTSignature(fileHandle, ws, sh, ds, nf);
 
-                    // Compute the FFT signature of the audio segment
-                    auto signature = UTILS::computeFFTSignature(fileHandle, ws, sh, ds, nf);
+            // Construct the output file path for the signature
+            std::string outputFilePath = outputDir + "/" + trackEntry.path().stem().string() + ".sig";
 
-                    // Construct the output file path for the signature
-                    std::string outputFilePath = trackOutputDir + "/" + segmentEntry.path().stem().string() + ".sig";
-
-                    // Write the signature to the output file
-                    std::ofstream outputFile(outputFilePath, std::ios::binary);
-                    if (!outputFile) {
-                        std::cerr << "Error opening output file: " << outputFilePath << std::endl;
-                        continue;
-                    }
-
-                    outputFile.write(reinterpret_cast<const char*>(signature.data()), static_cast<long>(signature.size()));
-                    outputFile.close();
-                }
+            // Write the signature to the output file
+            std::ofstream outputFile(outputFilePath, std::ios::binary);
+            if (!outputFile) {
+                std::cerr << "Error opening output file: " << outputFilePath << std::endl;
+                continue;
             }
+
+            outputFile.write(reinterpret_cast<const char*>(signature.data()), static_cast<long>(signature.size()));
+            outputFile.close();
         }
     }
 
