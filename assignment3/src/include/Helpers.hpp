@@ -47,8 +47,9 @@ namespace UTILS {
      *
      * @param samples A vector of audio samples to which noise will be added.
      * @param noiseLevel The standard deviation of the Gaussian noise.
+     * @return A new vector of audio samples with added noise.
      */
-    void addNoiseToAudio(std::vector<short>& samples, float noiseLevel);
+    std::vector<short> addNoiseToAudio(const std::vector<short>& samples, float noiseLevel);
 
     /**
      * Function to compute the Normalized Compression Distance (NCD) between two signatures using compression.

@@ -1,3 +1,4 @@
+#include <chrono>
 #include "include/Helpers.hpp"
 
 namespace UTILS {
@@ -119,14 +120,23 @@ namespace UTILS {
      *
      * @param samples A vector of audio samples to which noise will be added.
      * @param noiseLevel The standard deviation of the Gaussian noise.
+     * @return A new vector of audio samples with added noise.
      */
-    void addNoiseToAudio(std::vector<short>& samples, float noiseLevel) {
-        std::default_random_engine generator;
+    std::vector<short> addNoiseToAudio(const std::vector<short>& samples, float noiseLevel) {
+        const int shortMin = static_cast<int>(std::numeric_limits<short>::min()), shortMax = static_cast<int>(std::numeric_limits<short>::max());
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+        std::vector<short> noisySamples = samples;
+        std::default_random_engine generator(seed);
         std::normal_distribution<float> distribution(0.0, noiseLevel);
 
-        for (auto &sample : samples) {
-            sample += static_cast<short>(distribution(generator));
+        for (auto &sample : noisySamples) {
+            float noise = distribution(generator);
+            int noisySample = static_cast<int>(sample) + static_cast<int>(noise);
+            sample = static_cast<short>(std::clamp(noisySample, shortMin, shortMax));
         }
+
+        return noisySamples;
     }
 
     /**
