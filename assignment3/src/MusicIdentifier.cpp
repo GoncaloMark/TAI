@@ -6,6 +6,7 @@
 #include "Helpers.hpp"
 #include "Compressor.hpp"
 #include "Constants.hpp"
+#include <sndfile.hh>  // Include sndfile.hh for SndfileHandle
 
 std::string HelpMessage() {
     return "Usage: MusicIdentifier -q <query_file> -d <database_dir> [-m <compression_method>] -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>";
@@ -124,6 +125,9 @@ int main(int argc, char* argv[]) {
             std::cerr << "Error reading query audio file: " << queryFilePath << std::endl;
             return EXIT_FAILURE;
         }
+        
+        // Print the sample rate of the query file
+        //std::cout << "Sample rate of query file: " << queryFileHandle.samplerate() << " Hz" << std::endl;
 
         // Compute the FFT signature of the query audio file
         auto querySignature = UTILS::computeFFTSignature(queryFileHandle, windowSize, shift, downSampling, numFreqs);
@@ -142,6 +146,20 @@ int main(int argc, char* argv[]) {
                     continue;
                 }
 
+                //For Checking sample rates and deleting files with sample rate != 44100Hz
+                /*
+                // Print the sample rate of the track file
+                int sampleRate = trackFileHandle.samplerate();
+                std::cout << "Sample rate of track file " << audioFile.path().filename() << ": " << sampleRate << " Hz" << std::endl;
+
+                // Check if the sample rate is 44100 Hz
+                if (sampleRate != 44100) {
+                    std::cerr << "Sample rate is not 44100 Hz. Deleting file: " << audioFile.path().filename() << std::endl;
+                    std::filesystem::remove(audioFile.path());
+                    continue;
+                }
+                */
+
                 // Compute the FFT signature of the current track
                 auto trackSignature = UTILS::computeFFTSignature(trackFileHandle, windowSize, shift, downSampling, numFreqs);
 
@@ -152,7 +170,7 @@ int main(int argc, char* argv[]) {
                 } else {
                     ncd = UTILS::computeNCD(querySignature, trackSignature);
                 }
-                std::cout << "NCD with " << audioFile.path().filename().string() << ": " << ncd << std::endl;
+                //std::cout << "NCD with " << audioFile.path().filename().string() << ": " << ncd << std::endl;
 
                 // Update the best match if the current NCD is smaller
                 if (ncd < minNCD) {

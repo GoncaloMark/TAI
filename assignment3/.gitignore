@@ -5,6 +5,7 @@ example/
 
 build/
 data/query_segments/
+music/
 
 # Clion
 cmake-build-debug/
