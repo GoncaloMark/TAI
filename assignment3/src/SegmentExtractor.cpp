@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
 
     // Add noise to the segment if noise level is not zero
     if (noiseLevel > 0) {
-        UTILS::addNoiseToAudio(buffer, noiseLevel);
+        buffer = UTILS::addNoiseToAudio(buffer, noiseLevel);
     }
 
     // Write the segment to the output file

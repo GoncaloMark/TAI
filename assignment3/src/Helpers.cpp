@@ -119,14 +119,18 @@ namespace UTILS {
      *
      * @param samples A vector of audio samples to which noise will be added.
      * @param noiseLevel The standard deviation of the Gaussian noise.
+     * @return A new vector of audio samples with added noise.
      */
-    void addNoiseToAudio(std::vector<short>& samples, float noiseLevel) {
+    std::vector<short> addNoiseToAudio(const std::vector<short>& samples, float noiseLevel) {
+        std::vector<short> noisySamples = samples;
         std::default_random_engine generator;
         std::normal_distribution<float> distribution(0.0, noiseLevel);
 
-        for (auto &sample : samples) {
+        for (auto &sample : noisySamples) {
             sample += static_cast<short>(distribution(generator));
         }
+
+        return noisySamples;
     }
 
     /**
