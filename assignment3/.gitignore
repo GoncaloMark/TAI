@@ -4,7 +4,6 @@ bin/
 example/
 
 build/
-data/query_segments/
 music/
 
 
@@ -13,3 +12,4 @@ cmake-build-debug/
 *.csv
 *.freqs
 tests.sh
+data/query_segments/*.wav
