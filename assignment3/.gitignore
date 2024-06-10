@@ -1,0 +1,15 @@
+bin/
+.vscode/
+.idea/
+example/
+
+build/
+music/
+
+
+# Clion
+cmake-build-debug/
+*.csv
+*.freqs
+tests.sh
+data/query_segments/*.wav

@@ -1,0 +1,1 @@
+./bin/MusicIdentifier -q "data/query_segments/Denys-Kyshchuk-Dark-Future_15_10.wav" -m gzip -d data/audio_tracks

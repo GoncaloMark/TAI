@@ -1,7 +1,9 @@
-bin/
 .vscode/
 .idea/
 example/
+
 # Clion
-CMakeLists.txt
 cmake-build-debug/
+*.csv
+*.txt
+assignment3/tests.sh

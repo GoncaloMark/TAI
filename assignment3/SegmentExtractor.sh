@@ -1,0 +1,1 @@
+./bin/SegmentExtractor -i "data/audio_tracks/Denys-Kyshchuk-Dark-Future.wav" -o "data/query_segments/Denys-Kyshchuk-Dark-Future_15_10_noisy.wav" -start 15 -dur 10 -n 500
