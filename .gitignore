@@ -5,3 +5,5 @@ example/
 # Clion
 cmake-build-debug/
 *.csv
+*.txt
+assignment3/tests.sh
