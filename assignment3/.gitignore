@@ -7,7 +7,9 @@ build/
 data/query_segments/
 music/
 
+
 # Clion
 cmake-build-debug/
 *.csv
 *.freqs
+tests.sh

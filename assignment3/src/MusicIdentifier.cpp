@@ -9,7 +9,7 @@
 #include <sndfile.hh>  // Include sndfile.hh for SndfileHandle
 
 std::string HelpMessage() {
-    return "Usage: MusicIdentifier -q <query_file> -d <database_dir> [-m <compression_method>] -ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>";
+    return "Usage: MusicIdentifier -q <query_file> -d <database_dir> -m <compression_method> [-ws <window_size> -sh <shift> -ds <downsampling> -nf <num_freqs>]";
 }
 
 int main(int argc, char* argv[]) {
